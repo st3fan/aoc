@@ -12,7 +12,6 @@ TWO="L991,D492,L167,D678,L228,U504,R972,U506,R900,U349,R329,D802,R616,U321,R252,
 
 def parse_turns(turns):
     x, y = 0, 0
-    yield Point(x, y)
     for t in turns.split(","):
         d, v = t[0], int(t[1:])
         nx, ny = x, y
@@ -30,7 +29,7 @@ def parse_turns(turns):
 def part_one():
     one = LineString(parse_turns(ONE))
     two = LineString(parse_turns(TWO))
-    closest = min([abs(p.x) + abs(p.y) for p in one.intersection(two) if p.x != 0 and p.y != 0])
+    closest = min([abs(p.x) + abs(p.y) for p in one.intersection(two)])
     print("Part 1:", int(closest))
 
 
@@ -49,8 +48,7 @@ def part_two():
     two = LineString(parse_turns(TWO))
 
     closest = min([shorten(one,p).length + shorten(two,p).length
-                   for p in one.intersection(two)
-                   if p.x != 0 and p.y != 0])
+                   for p in one.intersection(two)])
     print("Part 2:", int(closest))
 
 
