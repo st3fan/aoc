@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 
+
 WIDTH  = 25
 HEIGHT = 6
 SIZE   = WIDTH * HEIGHT
+
+
+def read_layers(path):
+    with open("day08.data") as f:
+        data = f.read()
+        return [data[n*SIZE:(n+1)*SIZE] for n in range(len(data) // SIZE)]
 
 
 def count_digits(layer, digit):
@@ -17,18 +24,17 @@ def first_visible_pixel(layers, x, y):
     for layer in layers:
         if layer[y*WIDTH+x] in ('0', '1'):
             return layer[y*WIDTH+x]
-    print("FAIL?")
+
 
 def colorize(pixel):
     if pixel == '1':
         return u"\u2588"
     return ' '
 
+
 if __name__ == "__main__":
 
-    with open("day08.data") as f:
-        data = f.read()
-    layers = [data[n*SIZE:(n+1)*SIZE] for n in range(len(data) // SIZE)]
+    layers = read_layers("day08.data")
 
     # Part One
     
