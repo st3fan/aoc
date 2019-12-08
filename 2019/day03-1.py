@@ -30,8 +30,8 @@ def parse_turns(turns):
 def part_one():
     one = LineString(parse_turns(ONE))
     two = LineString(parse_turns(TWO))
-    closest = min([abs(p.x) + abs(p.y) for p in one.intersection(two)])
-    print("Part 1: ", int(closest))
+    closest = min([abs(p.x) + abs(p.y) for p in one.intersection(two) if p.x != 0 and p.y != 0])
+    print("Part 1:", int(closest))
 
 
 def shorten(ls, p):
@@ -48,16 +48,12 @@ def part_two():
     one = LineString(parse_turns(ONE))
     two = LineString(parse_turns(TWO))
 
-    for p in one.intersection(two):
-        #print(intersection)
-        a = shorten(one, p)
-        #print(a)
-        b = shorten(two, p)
-        #print(b)
-        distance = a.length + b.length
-        print(distance)
+    closest = min([shorten(one,p).length + shorten(two,p).length
+                   for p in one.intersection(two)
+                   if p.x != 0 and p.y != 0])
+    print("Part 2:", int(closest))
 
 
 if __name__ == "__main__":
-    #part_one()
+    part_one()
     part_two()
