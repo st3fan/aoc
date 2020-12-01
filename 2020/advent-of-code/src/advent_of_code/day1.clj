@@ -30,3 +30,7 @@
 
 (defn day1b []
   (find-sum expense-report 2020 3))
+
+(comment
+  (day1a)
+  (day1b))
