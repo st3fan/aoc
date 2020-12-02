@@ -1,6 +1,5 @@
 (ns advent-of-code.day2
-  (:require [advent-of-code.util :as util]
-            [clojure.java.io :as io]))
+  (:require [advent-of-code.util :as util]))
 
 (defn parse-input [line]
   (if-let [matches (re-matches #"(\d+)-(\d+) (.): (.+)" line)]
