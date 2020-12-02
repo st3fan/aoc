@@ -1,41 +1,25 @@
 (ns advent-of-code.day2
-  (:require [clojure.java.io :as io]))
+  (:require [advent-of-code.util :as util]
+            [clojure.java.io :as io]))
 
-;; Horrible code alert!
+(defn parse-input [line]
+  (if-let [matches (re-matches #"(\d+)-(\d+) (.): (.+)" line)]
+    [(Integer/parseInt (nth matches 1))
+     (Integer/parseInt (nth matches 2))
+     (first (char-array (nth matches 3))) ;; Ouch
+     (nth matches 4)]))
 
-(defn xor [a b] ;; TODO This should be a macro
-  (and (or a b)
-       (not= a b)))
+(defn check-policy-1 [[min max letter password]]
+  (let [count (util/count-characters password letter)]
+    (and (>= count min)
+         (<= count max))))
 
-(defn count-characters [s c]
-  (let [c (first (char-array c))]
-    (->> s
-         (filter (partial = c))
-         count)))
-
-(defn check-policy-1 [policy]
-  (if-let [matches (re-matches #"(\d+)-(\d+) (.): (.+)" policy)]
-    (let [min (Integer/parseInt (nth matches 1))
-          max (Integer/parseInt (nth matches 2))
-          letter (nth matches 3)
-          password (nth matches 4)]
-      (let [count (count-characters password letter)]
-        (and (>= count min)
-             (<= count max))))))
-
-(defn check-policy-2 [policy]
-  (if-let [matches (re-matches #"(\d+)-(\d+) (.): (.+)" policy)]
-    (let [posa (Integer/parseInt (nth matches 1))
-          posb (Integer/parseInt (nth matches 2))
-          letter (nth matches 3)
-          password (nth matches 4)]
-      (xor (= letter (str (nth password (dec posa))))
-           (= letter (str (nth password (dec posb))))))))
+(defn check-policy-2 [[posa posb letter password]]
+  (util/xor (= letter (nth password (dec posa)))
+            (= letter (nth password (dec posb)))))
 
 (defn part1 []
-  (let [input (line-seq (io/reader (io/resource (str "advent_of_code/day2/input"))))]
-    (count (filter true? (map check-policy-1 input)))))
+  (count (filter check-policy-1 (util/load-input 2 parse-input))))
 
 (defn part2 []
-  (let [input (line-seq (io/reader (io/resource (str "advent_of_code/day2/input"))))]
-    (count (filter true? (map check-policy-2 input)))))
+  (count (filter check-policy-2 (util/load-input 2 parse-input))))
