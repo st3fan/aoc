@@ -9,7 +9,7 @@
        (apply *)))
 
 (defn part1 []
-  (find-sum (util/load-input 1 #(Integer/parseInt %)) 2020 2))
+  (find-sum (util/load-input 2020 1 #(Integer/parseInt %)) 2020 2))
 
 (defn part2 []
-  (find-sum (util/load-input 1 #(Integer/parseInt %)) 2020 3))
+  (find-sum (util/load-input 2020 1 #(Integer/parseInt %)) 2020 3))

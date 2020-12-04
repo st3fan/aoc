@@ -2,23 +2,23 @@
   (:require [advent-of-code.util :as util]))
 
 (defn load-map []
-  (let [input (doall (util/load-input 3 seq))]
+  (let [input (util/load-input 2020 3 seq)]
     {:data  input
      :width (count (first input))
      :height (count input)}))
 
-(defn at-bottom [map y]
+(defn in-bounds? [map y]
   (>= y (:height map)))
 
-(defn has-tree [map x y]
+(defn tree? [map x y]
   (let [line (nth (:data map) y)]
     (= \# (nth line (mod x (:width map))))))
 
 (defn encountered-trees [map [slope-x slope-y]]
   (loop [x 0 y 0 c 0]
-    (if (at-bottom map y)
+    (if (in-bounds? map y)
       c
-      (recur (+ x slope-x) (+ y slope-y) (+ c (if (has-tree map x y) 1 0))))))
+      (recur (+ x slope-x) (+ y slope-y) (+ c (if (tree? map x y) 1 0))))))
 
 (defn part1 []
   (let [map (load-map)]

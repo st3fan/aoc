@@ -18,7 +18,7 @@
             (= letter (nth password (dec posb)))))
 
 (defn part1 []
-  (count (filter check-policy-1 (util/load-input 2 parse-input))))
+  (count (filter check-policy-1 (util/load-input 2020 2 parse-input))))
 
 (defn part2 []
-  (count (filter check-policy-2 (util/load-input 2 parse-input))))
+  (count (filter check-policy-2 (util/load-input 2020 2 parse-input))))

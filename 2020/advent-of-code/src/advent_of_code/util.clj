@@ -9,7 +9,7 @@
   (->> s (filter (partial = c)) count))
 
 (defn load-input
-  ([day]
-   (load-input day identity))
-  ([day transformer]
-   (map transformer (line-seq (io/reader (io/resource (str "advent_of_code/day" day "/input")))))))
+  ([year day]
+   (load-input year day identity))
+  ([year day transformer]
+   (map transformer (line-seq (io/reader (io/resource (str "advent_of_code/" year "/day" day "/input")))))))
