@@ -2,7 +2,8 @@
   (:require [clojure.test :refer :all]
             [advent-of-code.day1 :as day1]
             [advent-of-code.day2 :as day2]
-            [advent-of-code.day3 :as day3]))
+            [advent-of-code.day3 :as day3]
+            [advent-of-code.day4 :as day4]))
 
 (deftest day1-test
   (testing "Day 1, Part 1"
@@ -21,3 +22,9 @@
     (is (= 262 (day3/part1))))
   (testing "Day 3, Part 2"
     (is (= 2698900776 (day3/part2)))))
+
+(deftest day4-test
+  (testing "Day 4, Part 1"
+    (is (= 247 (day4/part1))))
+  (testing "Day 4, Part 2"
+    (is (= 145 (day4/part2)))))

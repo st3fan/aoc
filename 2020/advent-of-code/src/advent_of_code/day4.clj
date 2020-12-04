@@ -12,8 +12,7 @@
 
 (defn check-year [passport field min max]
   (if-let [v (Integer/parseInt (passport field))]
-    (and (>= v min)
-         (<= v max))))
+    (<= min v max)))
 
 (defn valid-byr? [passport]
   (check-year passport "byr" 1920 2020))
@@ -41,14 +40,8 @@
   (not (nil? (re-matches #"\d{9}" (passport "pid")))))
 
 (defn valid-passport? [passport]
-  (and (required-fields? passport)
-       (valid-byr? passport)
-       (valid-iyr? passport)
-       (valid-eyr? passport)
-       (valid-hgt? passport)
-       (valid-hcl? passport)
-       (valid-ecl? passport)
-       (valid-pid? passport)))
+  (every? #(% passport) [required-fields? valid-byr? valid-iyr? valid-eyr?
+                         valid-hgt? valid-hcl? valid-ecl? valid-pid?]))
 
 (defn part1 []
   (let [passports (load-input-data)]
