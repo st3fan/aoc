@@ -1,5 +1,6 @@
 (ns advent-of-code.test
   (:require [clojure.test :refer :all]
+            [advent-of-code.2019.day2]
             [advent-of-code.2019.day12]
             [advent-of-code.day1 :as day1]
             [advent-of-code.day2 :as day2]
@@ -7,6 +8,12 @@
             [advent-of-code.day4 :as day4]))
 
 ;; 2019
+
+(deftest year-2019-day-2-test
+  (testing "Year 2019, Day 2, Part 1"
+    (is (= 2692315 (advent-of-code.2019.day2/part1))))
+  (testing "Year 2019, Day 2, Part 2"
+    (is (= 9507 (advent-of-code.2019.day2/part2)))))
 
 (deftest year-2019-day-12-test
   (testing "Year 2019, Day 12, Part 1"
