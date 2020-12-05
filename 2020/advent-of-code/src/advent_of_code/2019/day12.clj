@@ -65,17 +65,19 @@
   (let [system (load-system)]
     (system-kinetic-energy (last (take 1001 (iterate simulate-motion system))))))
 
-(defn part2 []
-  nil)
-
 ;;
 
-(def test-system
-  {:iteration 0
-   :moons [(parse-moon "<x=-1, y=0, z=2>")
-           (parse-moon "<x=2, y=-10, z=-7>")
-           (parse-moon "<x=4, y=-8, z=8>")
-           (parse-moon "<x=3, y=5, z=-1>")]})
+(defn velocity-axis-zero? [system axis]
+  (every? #(zero? (get-in % [:v axis])) (:moons system)))
 
-(let [system test-system]
-  (system-kinetic-energy (last (take 11 (iterate simulate-motion system)))))
+(defn iterations-until-zero [system axis]
+  (->> system
+       (iterate simulate-motion)
+       (rest)
+       (filter #(velocity-axis-zero? % axis))
+       (first)
+       :iteration))
+
+(defn part2 []
+  (let [system (load-system)]
+    (apply * (map #(iterations-until-zero system %) [:x :y :z]))))
