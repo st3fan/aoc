@@ -45,11 +45,6 @@
     (let [system (system-apply-gravity system)]
       (assoc system :moons (mapv moon-apply-velocity (:moons system))))))
 
-;; TODO This was nicer
-;; (->> (update system :iteration inc)
-;;      (system-apply-gravity)
-;;      (mapv moon-apply-velocity)))
-
 (defn moon-kinetic-energy [moon]
   (* (+ (Math/abs (:x (:p moon))) (Math/abs (:y (:p moon))) (Math/abs (:z (:p moon))))
      (+ (Math/abs (:x (:v moon))) (Math/abs (:y (:v moon))) (Math/abs (:z (:v moon))))))
