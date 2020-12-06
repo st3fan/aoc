@@ -5,7 +5,9 @@
             [advent-of-code.day1 :as day1]
             [advent-of-code.day2 :as day2]
             [advent-of-code.day3 :as day3]
-            [advent-of-code.day4 :as day4]))
+            [advent-of-code.day4 :as day4]
+            [advent-of-code.day5 :as day5]
+            [advent-of-code.day6 :as day6]))
 
 ;; 2019
 
@@ -46,3 +48,15 @@
     (is (= 247 (day4/part1))))
   (testing "Day 4, Part 2"
     (is (= 145 (day4/part2)))))
+
+(deftest day5-test
+  (testing "Day 5, Part 1"
+    (is (= 989 (day5/part1))))
+  (testing "Day 5, Part 2"
+    (is (= 548 (day5/part2)))))
+
+(deftest day4-test
+  (testing "Day 6, Part 1"
+    (is (= 6587 (day6/part1))))
+  (testing "Day 6, Part 2"
+    (is (= 3235 (day6/part2)))))

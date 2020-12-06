@@ -30,10 +30,14 @@
        (> row min-row)
        (< row max-row)))
 
-(defn part1 []
+(defn part2 []
   (let [input (util/load-input 2020 5)
-        taken (set (map #(vector (row %) (column %)) (util/load-input 2020 5)))
+        taken (set (map #(vector (seat->row %) (seat->column %)) (util/load-input 2020 5)))
         min-row (apply min (map seat->row input))
         max-row (apply max (map seat->row input))]
-    (for [row (range 128) column (range 8) :when (seat-test taken row column min-row max-row)]
-      (+ (* 8 row) column))))
+    (first (for [row (range 128) column (range 8) :when (seat-test taken row column min-row max-row)]
+      (+ (* 8 row) column)))))
+
+;; (defn decode [code]
+;;   (-> (clojure.string/escape code {\F 0 \L 0 \B 1 \R 1})
+;;       (Long/parseLong 2)))
