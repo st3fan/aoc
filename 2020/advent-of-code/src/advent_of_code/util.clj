@@ -13,3 +13,10 @@
    (load-input year day identity))
   ([year day transformer]
    (map transformer (line-seq (io/reader (io/resource (str "advent_of_code/" year "/day" day "/input")))))))
+
+(defn load-input-string
+  ([year day]
+   (load-input-string year day identity))
+  ([year day transformer]
+   (transformer (slurp (io/resource (str "advent_of_code/" year "/day" day "/input"))))))
+
