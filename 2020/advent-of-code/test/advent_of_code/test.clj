@@ -112,7 +112,7 @@
   (testing "Day 7, Part 1"
     (is (= 242 (day7/part1))))
   (testing "Day 7, Part 2"
-    (is (= 0 (day7/part2)))))
+    (is (= 176035 (day7/part2)))))
 
 (deftest day8-test
   (testing "Day 8, Part 1"
