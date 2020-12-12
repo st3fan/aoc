@@ -15,9 +15,7 @@
 
 (defn F [ferry v]
   (let [dx (* v (:wx ferry)) dy (* v (:wy ferry))]
-    (-> ferry
-        (update :x + dx)
-        (update :y + dy))))
+    (-> ferry  (update :x + dx) (update :y + dy))))
 
 (defn- rotate-point [[wx wy] degrees]
   (case degrees
