@@ -28,15 +28,16 @@
      :height (count input)}))
 
 (defn seat-index [seats x y]
-  (+ (* y (:width seats)) x))
+  (if (and (>= x 0) (< x (:width seats)) (>= y 0) (< y (:height seats)))
+    (+ (* y (:width seats)) x)))
 
 (defn get-seat [seats x y]
-  (if (and (>= x 0) (< x (:width seats)) (>= y 0) (< y (:height seats)))
-    (get (:data seats) (seat-index seats x y))))
+  (get (:data seats) (seat-index seats x y)))
 
 (defn set-seat [seats x y v]
   (assoc-in seats [:data (seat-index seats x y)] v))
 
+;; Nested loop/recur is awful.
 (defn map-seats [original-seats fn]
   (loop [[y & rest] (range (:height original-seats)) seats original-seats]
     (if-not y
@@ -46,6 +47,7 @@
                       seats
                       (recur rest (set-seat seats x y (fn original-seats x y)))))))))
 
+;; Lame. Probably a one liner with combinatorics.
 (defn occupied-adjacent-seats [seats x y]
   (let [r [(get-seat seats (- x 1) (- y 1))
            (get-seat seats (- x 0) (- y 1))
@@ -61,16 +63,15 @@
 
 (defn apply-rules [seats x y]
   (let [v (get-seat seats x y)]
-    (cond
-      (and (= v \L) (= (occupied-adjacent-seats seats x y) 0)) \#
-      (and (= v \#) (> (occupied-adjacent-seats seats x y) 3)) \L
-      :else v)))
+    (cond (and (= v \L) (= (occupied-adjacent-seats seats x y) 0)) \#
+          (and (= v \#) (> (occupied-adjacent-seats seats x y) 3)) \L
+          :else v)))
 
 (defn flip-seats-until-stable [seats]
   (loop [a (map-seats seats apply-rules) b (map-seats a apply-rules)]
     (if (= a b)
       b
-      (let [a (map-seats a apply-rules) b (map-seats a apply-rules)]
+      (let [a (map-seats b apply-rules) b (map-seats a apply-rules)]
         (recur a b)))))
 
 (defn part1 []
