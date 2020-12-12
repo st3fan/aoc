@@ -1,8 +1,6 @@
 (ns advent-of-code.day12p2
   (:require [advent-of-code.util :as util]))
 
-;; Move the Waypoint instead
-
 (defn N [ferry v]
   (update ferry :wy + v))
 
@@ -15,18 +13,13 @@
 (defn W [ferry v]
   (update ferry :wx - v))
 
-;; Move the ship and Waypoint. Waypoint is relative to the ship. So
-;; find out deltas and then add to both ship and waypoint.
-
 (defn F [ferry v]
   (let [dx (* v (:wx ferry)) dy (* v (:wy ferry))]
     (-> ferry
         (update :x + dx)
         (update :y + dy))))
 
-;; Rotate the Waypoint around the ship
-
-(defn rotate-point [[wx wy] degrees]
+(defn- rotate-point [[wx wy] degrees]
   (case degrees
       0 [   wx     wy]
      90 [   wy  (- wx)]
@@ -48,7 +41,6 @@
 
 (defn move-ferry [ferry instructions]
   (loop [[instruction & rest] instructions ferry ferry]
-    (println ferry)
     (if-not instruction
       ferry
       (recur rest (execute-ferry-instruction ferry instruction)))))

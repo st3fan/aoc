@@ -1,4 +1,4 @@
-(ns advent-of-code.foo
+(ns advent-of-code.day12p1
   (:require [advent-of-code.util :as util]))
 
 (defn N [ferry v]
@@ -38,6 +38,8 @@
 
 (defn create-ferry []
   {:a 90 :x 0 :y 0})
+
+;;
 
 (defn parse-instruction [ins]
   (let [[_ op arg] (re-matches #"(\w)(\d+)" ins)]
