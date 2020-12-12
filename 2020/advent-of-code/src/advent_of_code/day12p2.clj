@@ -1,6 +1,15 @@
 (ns advent-of-code.day12p2
   (:require [advent-of-code.util :as util]))
 
+(defn parse-instruction [ins]
+  (let [[_ op arg] (re-matches #"(\w)(\d+)" ins)]
+    [op (Integer/parseInt arg)]))
+
+(defn load-instructions []
+  (util/load-input 2020 12 parse-instruction))
+
+;;
+
 (defn N [ferry v]
   (update ferry :wy + v))
 
@@ -45,15 +54,6 @@
 
 (defn create-ferry []
   {:x 0 :y 0 :wx 10 :wy 1 :wq 0})
-
-;;
-
-(defn parse-instruction [ins]
-  (let [[_ op arg] (re-matches #"(\w)(\d+)" ins)]
-    [op (Integer/parseInt arg)]))
-
-(defn load-instructions []
-  (util/load-input 2020 12 parse-instruction))
 
 ;;
 
