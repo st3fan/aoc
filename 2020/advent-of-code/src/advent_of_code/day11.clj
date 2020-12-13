@@ -47,7 +47,17 @@
                       seats
                       (recur rest (set-seat seats x y (fn original-seats x y)))))))))
 
-;; Lame. Probably a one liner with combinatorics.
+;;
+
+(defn flip-seats-until-stable [seats rules]
+  (loop [a (map-seats seats rules) b (map-seats a rules)]
+    (if (= a b)
+      b
+      (let [a (map-seats b rules) b (map-seats a rules)]
+        (recur a b)))))
+
+;;
+
 (defn occupied-adjacent-seats [seats x y]
   (let [r [(get-seat seats (- x 1) (- y 1))
            (get-seat seats (- x 0) (- y 1))
@@ -59,20 +69,42 @@
            (get-seat seats (+ x 1) (+ y 1))]]
     (count (filter #{\#} r))))
 
-;;
-
-(defn apply-rules [seats x y]
+(defn rules-v1 [seats x y]
   (let [v (get-seat seats x y)]
     (cond (and (= v \L) (= (occupied-adjacent-seats seats x y) 0)) \#
           (and (= v \#) (> (occupied-adjacent-seats seats x y) 3)) \L
           :else v)))
 
-(defn flip-seats-until-stable [seats]
-  (loop [a (map-seats seats apply-rules) b (map-seats a apply-rules)]
-    (if (= a b)
-      b
-      (let [a (map-seats b apply-rules) b (map-seats a apply-rules)]
-        (recur a b)))))
-
 (defn part1 []
-  (get (frequencies (:data (flip-seats-until-stable (load-seats)))) \#))
+  (get (frequencies (:data (flip-seats-until-stable (load-seats) rules-v1))) \#))
+
+;;
+
+(defn has-visible-seat [seats x y dx dy]
+  (loop [x (+ x dx) y (+ y dy)]
+    (let [v (get-seat seats x y)]
+      (if (or (nil? v) (= \L v))
+        false
+        (if (= v \#)
+          true
+          (recur (+ x dx) (+ y dy)))))))
+
+(defn visible-seats [seats x y]
+  (let [r [(has-visible-seat seats x y -1  1)
+           (has-visible-seat seats x y  0  1)
+           (has-visible-seat seats x y  1  1)
+           (has-visible-seat seats x y -1  0)
+           (has-visible-seat seats x y  1  0)
+           (has-visible-seat seats x y -1 -1)
+           (has-visible-seat seats x y  0 -1)
+           (has-visible-seat seats x y  1 -1)]]
+    (count (filter true? r))))
+
+(defn rules-v2 [seats x y]
+  (let [v (get-seat seats x y)]
+    (cond (and (= v \L) (= (visible-seats seats x y) 0)) \#
+          (and (= v \#) (> (visible-seats seats x y) 4)) \L
+          :else v)))
+
+(defn part2 []
+  (get (frequencies (:data (flip-seats-until-stable (load-seats) rules-v2))) \#))
