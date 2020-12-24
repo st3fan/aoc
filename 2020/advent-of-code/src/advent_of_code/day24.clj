@@ -9,14 +9,8 @@
 (defn parse-line [line]
   (map #(direction->vector (first %)) (re-seq #"(e|se|sw|w|nw|ne)" line)))
 
-(re-seq #"(e|se|sw|w|nw|ne)" "nwwswee")
-
-(parse-line "nwwswee")
-
 (defn sum-vectors [vectors]
   (reduce #(vector (+ (first %1) (first %2)) (+ (second %1) (second %2))) vectors))
-
-(sum-vectors (parse-line "nwwswee"))
 
 (defn load-input []
   (util/load-input 2020 24 #(sum-vectors (parse-line %))))
