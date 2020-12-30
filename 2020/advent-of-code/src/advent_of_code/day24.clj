@@ -18,18 +18,6 @@
 (defn load-test-input []
   (util/load-test-input 2020 24 #(sum-vectors (parse-line %))))
 
-;; Part 1
-
-(let [points (load-input)]
-  (loop [[p & rest-p] points result #{}]
-    (if-not p
-      (count result)
-      (if (contains? result p)
-        (recur rest-p (disj result p))
-        (recur rest-p (conj result p))))))
-
-;; Part 2
-
 ;; Doing the lazy thing here again and model the floor with a map
 ;; because checking neighbours is then a simple lookup.
 
@@ -68,6 +56,12 @@
 
 (defn count-black-tiles [floor]
   (->> floor vals (filter true?) (count)))
+
+;;
+
+(defn part1 []
+  (let [floor (insert-tiles (create-floor) (load-input))]
+    (count-black-tiles floor)))
 
 (defn part2 []
   (let [floor (insert-tiles (create-floor) (load-input))]
