@@ -14,32 +14,17 @@ LEFT=3
 def top(tile):
     return tile['edges'][TOP]
 
+
 def right(tile):
     return tile['edges'][RIGHT]
+
 
 def bottom(tile):
     return tile['edges'][BOTTOM]
 
+
 def left(tile):
     return tile['edges'][LEFT]
-
-
-def parse_edges(data):
-    return [data[0],                       # top
-            "".join([s[9] for s in data]), # right
-            data[9],                       # bottom
-            "".join([s[0] for s in data])] # left
-
-
-def parse_tile(data):
-    lines = data.split("\n")
-    return {"id": int(lines[0][5:-1]),
-            "edges": parse_edges(lines[1:11])}
-
-
-def parse_input(path):
-    with open(path) as f:
-        return [parse_tile(data) for data in f.read().split("\n\n")]
 
 
 def rotate(tile):
@@ -70,6 +55,24 @@ def flipv(tile):
     tile['edges'][LEFT] = tile['edges'][LEFT][::-1]
     tile['edges'][RIGHT] = tile['edges'][RIGHT][::-1]
     return tile
+
+
+def parse_edges(data):
+    return [data[0],                       # top
+            "".join([s[9] for s in data]), # right
+            data[9],                       # bottom
+            "".join([s[0] for s in data])] # left
+
+
+def parse_tile(data):
+    lines = data.split("\n")
+    return {"id": int(lines[0][5:-1]),
+            "edges": parse_edges(lines[1:11])}
+
+
+def parse_input(path):
+    with open(path) as f:
+        return [parse_tile(data) for data in f.read().split("\n\n")]
 
 
 def transform_tile(tile, *transformations):
@@ -109,30 +112,19 @@ def variations(tile):
     ]
 
 
-HEIGHT = 3
-WIDTH = 3
-
-
-tiles = parse_input("../../resources/advent_of_code/2020/day20/test")
-tiles_by_id = {tile['id']: tile for tile in tiles}
-
-grid = [None, None, None,
-        None, None, None,
-        None, None, None]
-
 def grid_get(grid, row, col):
     return grid[row * WIDTH + col]
+
 
 def grid_set(grid, row, col, tile):
     grid[row * WIDTH + col] = tile
 
 
 def available_tiles(tiles, grid):
-    tile_ids = [tile['id'] for tile in grid if tile is not None]
+    tile_ids = [tile['id'] for tile in grid if tile != None]
     for tile in tiles:
         if tile['id'] not in tile_ids:
-            for v in variations(tile):
-                yield v
+            yield tile
 
 
 def tile_fits(tile, grid, row, col):
@@ -144,10 +136,11 @@ def tile_fits(tile, grid, row, col):
         return False
     return True
 
+
 def find_empty(grid):
     for row in range(HEIGHT):
         for col in range(WIDTH):
-            if grid_get(grid, row, col) is None:
+            if grid_get(grid, row, col) == None:
                 return (row, col)
 
 def solve(grid):
@@ -158,36 +151,25 @@ def solve(grid):
     row, col = pos
 
     for tile in available_tiles(tiles, grid):
-        if tile_fits(tile, grid, row, col):
-            grid_set(grid, row, col, tile)
-            if solve(grid):
-                return True
-            grid_set(grid, row, col, None)
+        for v in variations(tile):
+            if tile_fits(tile, grid, row, col):
+                grid_set(grid, row, col, tile)
+                if solve(grid):
+                    return True
+                grid_set(grid, row, col, None)
     return False
+
+
+HEIGHT = 3
+WIDTH = 3
+
+grid = [None] * (HEIGHT * WIDTH)
+
 
 if __name__ == "__main__":
 
-    for tile in variations(tiles[0]):
-        print(tile)
-
-    #for tile in available_tiles(tiles, grid):
-    #    print(tile['id'])
-
-    #solve1()
-    #solve(grid, 0, 0)
+    tiles = parse_input("../../resources/advent_of_code/2020/day20/test")
+    tiles_by_id = {tile['id']: tile for tile in tiles}
 
     solve(grid)
     print(grid)
-
-    #print(grid[0][0] * grid[0][2] * grid[2][0] * grid[2][2])
-
-    # counter = Counter()
-    # for tile in tiles:
-    #     for v in variations(tile):
-    #         counter.update(v['edges'])
-    # print(counter)
-
-    # tile = {"edges": ["abc", "def", "ghi", "jkl"]}
-    # for v in variations(tile):
-    #     print(v['edges'])
-

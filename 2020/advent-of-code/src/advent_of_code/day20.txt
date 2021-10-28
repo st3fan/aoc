@@ -1,0 +1,32 @@
+
+   ROT        FLIPH       FLIPV
+
+  a b c       c b a       g h i
+ j     d     d     j     l     f
+ k     e     e     k     k     e
+ l     f     f     l     j     d
+  g h i       i h g       a b c
+
+R=1
+
+  j k l       l k j       d e f
+ g     a     a     g     i     c
+ h     b     b     h     h     b
+ i     c     c     i     g     a
+  d e f       f e d       j k l
+
+R=2
+
+  i h g       j h i       c b a
+ f     j     j     f     d     l
+ e     k     k     e     e     k
+ d     l     l     d     f     j
+  c b a       a b c       i h g
+
+R=3
+
+  d e f       f e d       l k j
+ c     i     i     c     a     g
+ b     h     h     b     b     h
+ a     g     g     a     c     i
+  l k j       j k l       d e f

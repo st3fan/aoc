@@ -21,9 +21,8 @@
     (if (empty? adapters)
       (conj result (+ 3 (apply max input)))
       (if-let [adapter (matching-adapter adapters (last result))]
-        (recur
-         (clojure.set/difference adapters #{adapter})
-         (conj result adapter))))))
+        (recur (clojure.set/difference adapters #{adapter})
+               (conj result adapter))))))
 
 ;;
 
@@ -32,6 +31,11 @@
     (* (get distribution 1) (get distribution 3))))
 
 ;;
+
+(defn matching-adapter [adapters rating]
+  (filter #(<= % (+ rating 3)) (sort adapters)))
+
+(def test-adapters [16 10 15 5 1 11 7 19 6 12 4])
 
 (defn part2 []
   0)

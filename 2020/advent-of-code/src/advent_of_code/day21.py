@@ -28,5 +28,3 @@ if __name__ == "__main__":
 
     answer2 = ",".join([allergens[i] for i in sorted(allergens.keys())])
     print("ANSWER2:", answer2)
-
-
