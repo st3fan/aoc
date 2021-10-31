@@ -21,11 +21,11 @@ def hex_distance(a, b):
 
 if __name__ == "__main__":
 
-    steps = read_input();
+    steps = read_input()
 
     # Part 1
 
-    p = Point(0,0,0)
+    p = Point(0, 0, 0)
 
     for step in steps:
         match step:
@@ -48,12 +48,12 @@ if __name__ == "__main__":
                 p.x += 1
                 p.y -= 1
 
-    print("Part one:", hex_distance(Point(0,0,0), p))
+    print("Part one:", hex_distance(Point(0, 0, 0), p))
 
     # Part 2
 
     max_distance = 0
-    p = Point(0,0,0)
+    p = Point(0, 0, 0)
 
     for step in steps:
         match step:
@@ -75,7 +75,6 @@ if __name__ == "__main__":
             case "se":
                 p.x += 1
                 p.y -= 1
-        max_distance = max(max_distance, hex_distance(Point(0,0,0), p))
+        max_distance = max(max_distance, hex_distance(Point(0, 0, 0), p))
 
     print("Part two:", max_distance)
-
