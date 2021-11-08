@@ -1,5 +1,6 @@
 
 
+from dataclasses import dataclass
 from itertools import islice, product
 
 
@@ -29,3 +30,83 @@ def same(e):
 def empty(e):
     return len(e) == 0
 
+
+@dataclass(frozen=True)
+class Position:
+    x: int
+    y: int
+
+
+class InfiniteGrid:
+    @classmethod
+    def from_file(cls, path):
+        grid = cls()
+        with open(path) as fp:
+            lines = fp.readlines()
+            for y, line in enumerate([line.strip() for line in lines]):
+                for x, v in enumerate(line):
+                    grid.set(Position(x, len(lines) - y - 1), v)
+        return grid
+
+    def __init__(self):
+        self.nodes = dict()
+
+    def get(self, p):
+        return self.nodes.get(p)
+
+    def set(self, p, v):
+        self.nodes[p] = v
+
+    def remove(self, p):
+        return self.nodes.pop(p, None)
+
+    def maxx(self):
+        return max(p.x for p in self.nodes)
+
+    def maxy(self):
+        return max(p.y for p in self.nodes)
+
+
+class Turtle:
+
+    UP = 0
+    RIGHT = 1
+    DOWN = 2
+    LEFT = 3
+
+    def __init__(self, position=Position(0,0)):
+        self.position = position
+        self.direction = Turtle.UP
+
+    def left(self):
+        match self.direction:
+            case Turtle.UP:
+                self.direction = Turtle.LEFT
+            case Turtle.RIGHT:
+                self.direction = Turtle.UP
+            case Turtle.DOWN:
+                self.direction = Turtle.RIGHT
+            case Turtle.LEFT:
+                self.direction = Turtle.DOWN
+
+    def right(self):
+        match self.direction:
+            case Turtle.UP:
+                self.direction = Turtle.RIGHT
+            case Turtle.RIGHT:
+                self.direction = Turtle.DOWN
+            case Turtle.DOWN:
+                self.direction = Turtle.LEFT
+            case Turtle.LEFT:
+                self.direction = Turtle.UP
+
+    def forward(self):
+        match self.direction:
+            case Turtle.UP:
+                self.position = Position(self.position.x, self.position.y+1)
+            case Turtle.RIGHT:
+                self.position = Position(self.position.x+1, self.position.y)
+            case Turtle.DOWN:
+                self.position = Position(self.position.x, self.position.y-1)
+            case Turtle.LEFT:
+                self.position = Position(self.position.x-1, self.position.y)
