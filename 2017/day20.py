@@ -2,6 +2,7 @@
 
 
 import re
+from collections import defaultdict
 from dataclasses import dataclass
 
 
@@ -24,7 +25,7 @@ class Velocity:
         return Velocity(self.x + other.x, self.y + other.y, self.z + other.z)
 
 
-@dataclass
+@dataclass(frozen=True)
 class Position:
     x: int
     y: int
@@ -38,6 +39,7 @@ class Position:
 
 @dataclass
 class Particle:
+    i: int
     p: Position
     v: Velocity
     a: Acceleration
@@ -58,27 +60,47 @@ class Swarm:
         for p in self.particles:
             p.tick()
 
+    def remove_collisions(self):
+        d = defaultdict(list)
+        for p in self.particles:
+            d[p.p].append(p)
+        for particles in d.values():
+            if len(particles) > 1:
+                for p in particles:
+                    self.particles.remove(p)
 
-if __name__ == "__main__":
 
+def read_particles(path):
     particles = []
-    for line in [line.strip() for line in open("day20.input").readlines()]:
+    for i, line in enumerate([line.strip() for line in open(path).readlines()]):
         v = [int(m) for m in re.findall(r"-?\d+", line)]
         position = Position(v[0], v[1], v[2])
         velocity = Velocity(v[3], v[4], v[5])
-        acceleration = Acceleration(v[6], v[5], v[6]) 
-        particles.append(Particle(position, velocity, acceleration))
+        acceleration = Acceleration(v[6], v[7], v[8]) 
+        particles.append(Particle(i, position, velocity, acceleration))
+    return particles
 
+
+if __name__ == "__main__":
+
+    # Part 1
+
+    particles = read_particles("day20.input")
     swarm = Swarm(particles)
-    
-    for _ in range(5000):
+    for _ in range(1000):
         swarm.tick()
 
-    distances = [p.distance() for p in swarm.particles]
-    print(sorted(distances))
-    
-    min_num = min(distances)
-    index = distances.index(min_num)
+    particles = sorted(swarm.particles, key=Particle.distance)
 
-    print("Part one:", index)
+    print("Part one:", particles[0].i)
+
+    # Part 2
+
+    particles = read_particles("day20.input")
+    swarm = Swarm(particles)
+    for _ in range(1000):
+        swarm.tick()
+        swarm.remove_collisions()
+
+    print("Part two:", len(swarm.particles))
 
