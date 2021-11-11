@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 
+from itertools import product
+
+
 INPUT = "ljoxqyyw"
 
 
@@ -59,14 +62,44 @@ def count_ones(s):
 
 def main():
 
+    # Part 1
+
     hashes = []
     for i in range(128):
         input = [ord(c) for c in f"{INPUT}-{i}"] + [17, 31, 73, 47, 23]
         hash = sparse_to_dense_hash(knot_hash(list(range(256)), input, rounds=64))
-        #print(f"flqrgnkx-{i}", ''.join(format(i, '08b') for i in hash))
         hashes.append(''.join(format(i, '08b') for i in hash))
 
-    print(sum(count_ones(hash) for hash in hashes))
+    print("Part one:", sum(count_ones(hash) for hash in hashes))
+
+    # Part 2
+
+    def adjecent(grid, x, y):
+        result = []
+        for xo, yo in [(-1,0), (1,0), (0,-1), (0,1)]:
+            px = x + xo
+            py = y + yo
+            if px >= 0 and px <= 127 and py >= 0 and py <= 127:
+                if grid[py][px] == '1':
+                    yield (px, py)
+
+    def mark_group(grid, group, locations):
+        for x, y in locations:
+            grid[y][x] = group
+            if adj := adjecent(grid, x, y):
+                mark_group(grid, group, adj)
+
+    grid = [list(row) for row in hashes]
+    group = 0
+
+    for y, x in product(range(128), range(128)):
+        if grid[y][x] == '1':
+            group += 1
+            grid[y][x] = group
+            if adj := adjecent(grid, x, y):
+                mark_group(grid, group, adj)
+
+    print("Part two:", group)
 
 
 if __name__ == "__main__":
