@@ -18,15 +18,17 @@ if __name__ == "__main__":
 
     print(ring[(pos+1) % len(ring)])
 
-    # Part 2
+    # Part 2 - Unfortunately I pieced this together from Reddit
 
-    ring = [0]
     pos = 0
+    second = None
 
-    for n in range(1, 50000000):
-        pos = (pos + INPUT) % len(ring)
-        ring.insert(pos+1, n)
-        pos = (pos + 1) % len(ring)
+    for j in range(1, 50000000 // 2):
+        check = (pos + INPUT) % j
+        if check == 0:
+            second = j
+        pos = check + 1
 
-    print(ring[(pos+1) % len(ring)])
+
+    print("Part two:", second)
 
