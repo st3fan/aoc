@@ -36,6 +36,27 @@ class Position:
     x: int
     y: int
 
+    @classmethod
+    def from_string(cls, s):
+        c = s.split(",")
+        return cls(int(c[0]), int(c[1]))
+
+
+class Grid:
+    def __init__(self, width, height, default=None):
+        self.width = width
+        self.height = height
+        self.nodes = [default] * (width * height)
+
+    def get(self, p):
+        return self.nodes[p.x + (p.y * self.width)]
+
+    def set(self, p, v, default=None):
+        self.nodes[p.x + (p.y * self.width)] = v
+
+    def count(self, value):
+        return sum(node == value for node in self.nodes)
+
 
 class InfiniteGrid:
     @classmethod
@@ -110,3 +131,23 @@ class Turtle:
                 self.position = Position(self.position.x, self.position.y-1)
             case Turtle.LEFT:
                 self.position = Position(self.position.x-1, self.position.y)
+
+
+class Santa:
+    """Like a turtle, except we move N/S/E/W"""
+    
+    def __init__(self, position=Position(0,0)):
+        self.position = position
+
+    def west(self):
+        self.position = Position(self.position.x-1, self.position.y)
+
+    def east(self):
+        self.position = Position(self.position.x+1, self.position.y)
+
+    def north(self):
+        self.position = Position(self.position.x, self.position.y-1)
+
+    def south(self):
+        self.position = Position(self.position.x, self.position.y+1)
+

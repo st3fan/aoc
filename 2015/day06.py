@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-from aoc import Position
+from aoc import Position, Grid
 from dataclasses import dataclass
 
 
@@ -18,23 +18,6 @@ class Instruction:
             return cls(Position.from_string(c[-3]), Position.from_string(c[-1]), "toggle")
         else:
             return cls(Position.from_string(c[-3]), Position.from_string(c[-1]), c[1])
-
-
-class Grid:
-    def __init__(self, width, height, default=None):
-        self.width = width
-        self.height = height
-        self.nodes = [default] * (width * height)
-
-    def get(self, p):
-        return self.nodes[p.x + (p.y * self.width)]
-
-    def set(self, p, v, default=None):
-        self.nodes[p.x + (p.y * self.width)] = v
-
-    def count(self, value):
-        return sum(node == value for node in self.nodes)
-
 
 
 def main():
