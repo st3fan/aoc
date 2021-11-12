@@ -29,7 +29,6 @@ if __name__ == "__main__":
     max_distance = 0
 
     for trip in permutations(cities):
-        print(trip)
         distance = sum(distances[(a,b)] for a,b in pairwise(trip))
         min_distance = min(min_distance, distance)
         max_distance = max(max_distance, distance)
