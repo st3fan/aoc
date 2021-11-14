@@ -43,6 +43,16 @@ class Position:
 
 
 class Grid:
+    @classmethod
+    def from_file(cls, path):
+        with open(path) as fp:
+            rows = []
+            for line in (line.strip() for line in fp.readlines()):
+                rows.append(list(line))
+            grid = cls(len(rows[0]), len(rows))
+            grid.setnodes(rows)
+            return grid
+
     def __init__(self, width, height, default=None):
         self.width = width
         self.height = height
@@ -54,8 +64,27 @@ class Grid:
     def set(self, p, v, default=None):
         self.nodes[p.x + (p.y * self.width)] = v
 
+    def setnodes(self, rows):
+        assert self.height == len(rows)
+        assert self.width == len(rows[0])
+        self.nodes = []
+        for row in rows:
+            self.nodes += row
+
     def count(self, value):
         return sum(node == value for node in self.nodes)
+
+    def neighbours(self, p, value=None):
+        for xo, yo in [(0,1), (1,1), (1,0), (1,-1), (0,-1), (-1,-1), (-1,0), (-1,1)]:
+            px = p.x + xo
+            py = p.y + yo
+            if px >= 0 and px < self.width and py >= 0 and py < self.height:
+                yield Position(px, py)
+
+    def copy(self):
+        grid = Grid(self.width, self.height)
+        grid.nodes = list(self.nodes)
+        return grid
 
 
 class InfiniteGrid:
