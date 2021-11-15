@@ -3,6 +3,8 @@
  *
  * Brute force solution that uses Darwin's Dispatch Queues. Only compiles
  * on macOS. Will use all available cores to split up the problem space.
+ *
+ * cc -Ofast day20.c && time ./a.out
  */
 
 #include <stdio.h>
