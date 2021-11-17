@@ -24,12 +24,13 @@ def matches1(knowns, aunt):
 
 def matches2(knowns, aunt):
     for k, v in aunt.items():
+        print(k)
         match k:
             case "cats" | "trees":
-                if not knowns[k] > v:
+                if v <= knowns[k]:
                     return False
             case "pomeranians" | "goldfish":
-                if not knowns[k] < v:
+                if v >= knowns[k]:
                     return False
             case _:
                 if knowns[k] != v:
