@@ -38,7 +38,10 @@ def main():
                     result.add(replace(medicine, r, i, i+2))
     print("Part one:", len(result))
 
-    # Part 2
+    # Part 2 - I wonder if the puzzle input generator made a mistake
+    # here because this "reverse replacement" solution only works
+    # when I randomize the replacements. I get the right answer but
+    # it takes a few thousand tries.
 
     replacements, medicine = read_input("day19.input")
 
@@ -48,7 +51,7 @@ def main():
             for e in replacements[k]:
                 reverse_replacements[e] = k
 
-        reverse_replacements_keys = list(reversed(sorted(reverse_replacements.keys(), key=len)))
+        reverse_replacements_keys = list(reverse_replacements.keys())
         random.shuffle(reverse_replacements_keys)
 
         steps = 0
@@ -59,6 +62,7 @@ def main():
                     medicine = medicine.replace(r, reverse_replacements[r], 1)
                     steps += 1
             if m == medicine:
+                # No changes so we're locked in a loop
                 return None
         return steps
 
