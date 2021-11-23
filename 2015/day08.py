@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 
+from ast import literal_eval
 import json
 
 
@@ -8,7 +9,7 @@ def encode(s):
     return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 def decode(s):
-    return eval(s) # So lazy
+    return literal_eval(s) # So lazy
 
 
 if __name__ == "__main__":
