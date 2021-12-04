@@ -2,7 +2,7 @@
 
 
 from collections import Counter
-from functools import lru_cache
+from functools import lru_cache # Makes _rate 40x faster :-)
 
 
 def load():
