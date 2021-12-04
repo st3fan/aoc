@@ -2,6 +2,7 @@
 
 
 from collections import Counter
+from functools import lru_cache
 
 
 def load():
@@ -10,6 +11,7 @@ def load():
 
 # Part 1
 
+@lru_cache(maxsize=1000)
 def _rate(l, reverse=True):
     counters = [Counter() for _ in range(len(l[0]))]
     for n in l:
@@ -26,14 +28,14 @@ def _rate(l, reverse=True):
 
 
 def _epsilon_rate(l):
-    return _rate(l, True)
+    return _rate(tuple(l), True)
 
 def epsilon_rate(l):
     return int(_epsilon_rate(l), 2)
 
 
 def _gamma_rate(l):
-    return _rate(l, False)
+    return _rate(tuple(l), False)
 
 def gamma_rate(l):
     return int(_gamma_rate(l), 2)
