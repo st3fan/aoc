@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 
 
-from dataclasses import dataclass
 from aoc import InfiniteGrid, Position, Line
-
-
 
 
 def load():
@@ -49,7 +46,7 @@ def grid_line2(grid, line):
     x = line.start.x
     y = line.start.y
 
-    for v in range(steps + 1):
+    for _ in range(steps + 1):
         p = Position(x, y)
         grid.set(p, grid.get(p, 0) + 1)
         x += xi
@@ -60,15 +57,14 @@ def part1():
     grid = InfiniteGrid()
     for line in load():
         grid_line1(grid, line)
-    return sum(v > 1 for p,v in grid.nodes.items())
-    
+    return sum(v > 1 for v in grid.nodes.values())
 
 
 def part2():
     grid = InfiniteGrid()
     for line in load():
         grid_line2(grid, line)
-    return sum(v > 1 for p,v in grid.nodes.items())
+    return sum(v > 1 for v in grid.nodes.values())
 
 
 if __name__ == "__main__":
