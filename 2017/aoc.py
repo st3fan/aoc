@@ -42,6 +42,24 @@ class Position:
         return cls(int(c[0]), int(c[1]))
 
 
+@dataclass(frozen=True)
+class Line:
+    start: Position
+    end: Position
+
+    @classmethod
+    def from_string(cls, s):
+        c = s.split()
+        if c[1] == "->":
+            return cls(Position.from_string(c[0]), Position.from_string(c[2]))
+
+    def ishorizontal(self):
+        return self.start.y == self.end.y
+
+    def isvertical(self):
+        return self.start.x == self.end.x
+
+
 class Grid:
     @classmethod
     def from_file(cls, path):
@@ -101,8 +119,8 @@ class InfiniteGrid:
     def __init__(self):
         self.nodes = dict()
 
-    def get(self, p):
-        return self.nodes.get(p)
+    def get(self, p, default=None):
+        return self.nodes.get(p, default)
 
     def set(self, p, v):
         self.nodes[p] = v
