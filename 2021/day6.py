@@ -34,15 +34,8 @@ def part2():
         r[v] += 1
     for _ in range(256):
         t = r[0]
-        r[0] = r[1]
-        r[1] = r[2]
-        r[2] = r[3]
-        r[3] = r[4]
-        r[4] = r[5]
-        r[5] = r[6]
-        r[6] = t + r[7]
-        r[7] = r[8]
-        r[8] = t
+        r = r[1:] + [r[0]]
+        r[6] += t
     return sum(r)
     
 
