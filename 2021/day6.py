@@ -34,7 +34,7 @@ def part2():
         r[v] += 1
     for _ in range(256):
         t = r[0]
-        r = r[1:] + [r[0]]
+        r.append(r.pop(0))
         r[6] += t
     return sum(r)
     
