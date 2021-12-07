@@ -1,11 +1,7 @@
 #!/usr/bin/env/python3
 
 
-from collections import Counter
-
-
 def load():
-    #return [3,4,3,1,2]
     return [int(line.strip()) for line in open("day6.input").readline().split(",")]
 
 
