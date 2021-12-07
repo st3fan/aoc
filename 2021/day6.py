@@ -1,6 +1,9 @@
 #!/usr/bin/env/python3
 
 
+from collections import Counter
+
+
 def load():
     #return [3,4,3,1,2]
     return [int(line.strip()) for line in open("day6.input").readline().split(",")]
@@ -26,10 +29,22 @@ def part1():
 
 
 def part2():
-    # These are the values that day6.c outputs
-    totals = [6206821033, 5617089148, 5217223242, 4726100874, 4368232009]
-    return sum(totals[n-1] for n in load())
-
+    r = [0] * 9
+    for v in load():
+        r[v] += 1
+    for _ in range(256):
+        t = r[0]
+        r[0] = r[1]
+        r[1] = r[2]
+        r[2] = r[3]
+        r[3] = r[4]
+        r[4] = r[5]
+        r[5] = r[6]
+        r[6] = t + r[7]
+        r[7] = r[8]
+        r[8] = t
+    return sum(r)
+    
 
 if __name__ == "__main__":
     print("Part one:", part1())
