@@ -6,10 +6,7 @@ def load():
 
 
 def fuel_spent1(start_positions, end_position):
-    total = 0
-    for p in start_positions:
-        total += abs(p - end_position)
-    return total
+    return sum(abs(p - end_position) for p in start_positions)
 
 
 def part1():
