@@ -18,10 +18,9 @@ def part1():
 
 
 def adjecent(grid, p, seen):
-    for neighbour in grid.neighbours(p, diagonal=False):
-        if neighbour not in seen:
-            if grid.get(neighbour) > grid.get(p) and grid.get(neighbour) != 9:
-                yield neighbour
+    def _check(n):
+        return n not in seen and grid.get(n) > grid.get(p) and grid.get(n) != 9
+    return [n for n in grid.neighbours(p, diagonal=False) if _check(n)]
 
 
 def extend_group(grid, points, seen):

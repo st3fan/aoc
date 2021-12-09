@@ -62,11 +62,11 @@ class Line:
 
 class Grid:
     @classmethod
-    def from_file(cls, path):
+    def from_file(cls, path, value_fn = lambda v: v):
         with open(path) as fp:
             rows = []
             for line in (line.strip() for line in fp.readlines()):
-                rows.append(list(line))
+                rows.append([value_fn(e) for e in line])
             grid = cls(len(rows[0]), len(rows))
             grid.setnodes(rows)
             return grid
@@ -92,8 +92,12 @@ class Grid:
     def count(self, value):
         return sum(node == value for node in self.nodes)
 
-    def neighbours(self, p, value=None):
-        for xo, yo in [(0,1), (1,1), (1,0), (1,-1), (0,-1), (-1,-1), (-1,0), (-1,1)]:
+    def neighbours(self, p, diagonal=False):
+        if diagonal:
+            positions = [(0,1), (1,1), (1,0), (1,-1), (0,-1), (-1,-1), (-1,0), (-1,1)]
+        else:
+            positions = [(-1,0), (1,0), (0,1), (0,-1)]
+        for xo, yo in positions:
             px = p.x + xo
             py = p.y + yo
             if px >= 0 and px < self.width and py >= 0 and py < self.height:
