@@ -66,15 +66,12 @@ def fix_corrupt_chunk(chunk):
             case "[":
                 if len(s) == 0 or s.pop() != "]":
                     fix.append("]")
-                pass
             case "{":
                 if len(s) == 0 or s.pop() != "}":
                     fix.append("}")
-                pass
             case "<":
                 if len(s) == 0 or s.pop() != ">":
                     fix.append(">")
-                pass
 
     points = {")": 1, "]": 2, "}": 3, ">": 4}
 
