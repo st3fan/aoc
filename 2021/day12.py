@@ -22,17 +22,6 @@ def is_big_cave(node):
     return node.isupper()
 
 
-def is_valid_path(path):
-    seen = set()
-    for node in path:
-        if is_small_cave(node):
-            if node in seen:
-                return False
-            else:
-                seen.add(node)
-    return True
-
-
 # DFS Traversal with the only logic added being that small caves can
 # be visited once while big caves many times.
 
