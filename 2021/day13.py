@@ -22,7 +22,6 @@ def count_pixels(image):
     total = 0
     for x in range(image.width):
         for y in range(image.height):
-            #print(image.getpixel((x,y)))
             if image.getpixel((x,y)) != (0,0,0,0):
                 total += 1
     return total
