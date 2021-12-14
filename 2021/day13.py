@@ -35,7 +35,6 @@ def count_pixels(image):
 def fold_horizontally(image, y):
     a = image.transform((image.width, y), Image.EXTENT, (0, 0, image.width, y)).transpose(Image.FLIP_TOP_BOTTOM)
     b = image.transform((image.width, image.height-y-1), Image.EXTENT, (0, y+1, image.width, image.height))
-    assert b.height <= a.height
     a.alpha_composite(b, dest=(0, a.height-b.height))
     return a
 
@@ -43,7 +42,6 @@ def fold_horizontally(image, y):
 def fold_vertically(image, x):
     a = image.transform((x, image.height), Image.EXTENT, (0, 0, x, image.height)).transpose(Image.FLIP_LEFT_RIGHT)
     b = image.transform((image.width-x-1, image.height), Image.EXTENT, (x+1, 0, image.width, image.height))
-    assert b.width <= a.width
     a.alpha_composite(b, dest=(a.width-b.width, 0))
     return a
 
