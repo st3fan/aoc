@@ -28,10 +28,6 @@ def count_pixels(image):
     return total
 
 
-# fold up ... b on top of a
-# left, upper, right, lower
-
-
 def fold_horizontally(image, y):
     a = image.transform((image.width, y), Image.EXTENT, (0, 0, image.width, y)).transpose(Image.FLIP_TOP_BOTTOM)
     b = image.transform((image.width, image.height-y-1), Image.EXTENT, (0, y+1, image.width, image.height))
