@@ -71,7 +71,7 @@ def part2():
     for p in pixels:
         image.putpixel(p, (255,0,0))
 
-    for i, f in enumerate(load_folds()):
+    for f in load_folds():
         match f:
             case ("x", int(x)):
                 image = fold_vertically(image, x)
