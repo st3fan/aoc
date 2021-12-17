@@ -21,10 +21,10 @@ def create_probe(vx, vy):
 
 def part1():
 
-    xs = 20
-    xe = 30
-    ys = -10
-    ye = -5
+    #xs = 20
+    #xe = 30
+    #ys = -10
+    #ye = -5
 
     xs = 207
     xe = 263
@@ -47,10 +47,10 @@ def part1():
 
 def part2():
 
-    xs = 20
-    xe = 30
-    ys = -10
-    ye = -5
+    #xs = 20
+    #xe = 30
+    #ys = -10
+    #ye = -5
 
     xs = 207
     xe = 263
@@ -70,5 +70,5 @@ def part2():
 
 
 if __name__ == "__main__":
-    #print("Part one:", part1())
+    print("Part one:", part1())
     print("Part two:", part2())
