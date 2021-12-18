@@ -45,50 +45,36 @@ class OperatorPacket(Packet):
 
 
 class SumPacket(OperatorPacket):
-    def __init__(self, bs):
-        super().__init__(bs)
     def value(self):
         return sum(p.value() for p in self.subpackets)
 
 
 class ProductPacket(OperatorPacket):
-    def __init__(self, bs):
-        super().__init__(bs)
     def value(self):
         return functools.reduce(operator.mul, [p.value() for p in self.subpackets])
 
 
 class MinimumPacket(OperatorPacket):
-    def __init__(self, bs):
-        super().__init__(bs)
     def value(self):
         return min(p.value() for p in self.subpackets)
 
 
 class MaximumPacket(OperatorPacket):
-    def __init__(self, bs):
-        super().__init__(bs)
     def value(self):
         return max(p.value() for p in self.subpackets)
 
 
 class GreaterThanPacket(OperatorPacket):
-    def __init__(self, bs):
-        super().__init__(bs)
     def value(self):
         return int(self.subpackets[0].value() > self.subpackets[1].value())
 
 
 class LessThanPacket(OperatorPacket):
-    def __init__(self, bs):
-        super().__init__(bs)
     def value(self):
         return int(self.subpackets[0].value() < self.subpackets[1].value())
 
 
 class EqualToPacket(OperatorPacket):
-    def __init__(self, bs):
-        super().__init__(bs)
     def value(self):
         return int(self.subpackets[0].value() == self.subpackets[1].value())
 
