@@ -80,7 +80,7 @@ class EqualToPacket(OperatorPacket):
 
 
 def read_packet(bs):
-    version, type = bs.peeklist(["uint:3", "uint:3"])
+    _, type = bs.peeklist(["uint:3", "uint:3"])
     match type:
         case 0:
             return SumPacket(bs)
