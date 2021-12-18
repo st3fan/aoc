@@ -35,7 +35,7 @@ def part1():
     for vx in range(263):
         for vy in range(1000):
             max_y = 0
-            for i, p in enumerate(create_probe(vx, vy)):
+            for p in create_probe(vx, vy):
                 max_y = max(max_y, p[1])
                 if p[1] < ys:
                     break
@@ -46,7 +46,6 @@ def part1():
 
 
 def part2():
-
     #xs = 20
     #xe = 30
     #ys = -10
