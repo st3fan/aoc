@@ -1,0 +1,15 @@
+{
+  "devDependencies": {
+    "jest": "^28.1.0",
+    "parcel": "^2.6.0"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "name": "not-quite-lisp",
+  "version": "1.0.0",
+  "source": "src/index.js",
+  "main": "dist/main.js",
+  "author": "Stefan Arentz <stefan@arentz.ca>",
+  "license": "MIT"
+}

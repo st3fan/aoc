@@ -1,0 +1,10 @@
+{
+  "name": "perfectly-spherical-houses-in-a-vacuum",
+  "version": "1.0.0",
+  "main": "src/main.js",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.16.0",
+    "jest": "^28.1.0"
+  }
+}

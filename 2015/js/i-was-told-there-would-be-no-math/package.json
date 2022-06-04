@@ -1,0 +1,14 @@
+{
+  "name": "i-was-told-there-would-be-no-math",
+  "version": "1.0.0",
+  "main": "src/main.js",
+  "type": "module",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.18.2",
+    "@babel/preset-env": "^7.18.2",
+    "babel-jest": "^28.1.0",
+    "jest": "^28.1.0",
+    "parcel": "^2.6.0"
+  }
+}
