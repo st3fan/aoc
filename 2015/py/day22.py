@@ -137,7 +137,7 @@ class Game:
                         self.player.armor += spell.armor
                     if spell.mana:
                         self.player.mana += spell.mana
-                    
+
                 if spell.duration != 1:
                     effect = Effect(spell)
                     #if spell.immediate:
