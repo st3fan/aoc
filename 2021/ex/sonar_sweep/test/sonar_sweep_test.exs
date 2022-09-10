@@ -9,4 +9,8 @@ defmodule SonarSweepTest do
   test "part2" do
     assert SonarSweep.part2() == 1571
   end
+
+  test "part2 optimized" do
+    assert SonarSweep.part2_optimized() == 1571
+  end
 end
