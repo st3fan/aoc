@@ -58,15 +58,15 @@ fn distances_from_routes(routes: &Vec<Route>) -> HashMap<Leg, i32> {
     for route in routes {
         distances.insert(
             Leg {
-                a: &route.from,
-                b: &route.to,
+                a: route.from.clone(),
+                b: route.to.clone(),
             },
             route.distance,
         );
         distances.insert(
             Leg {
-                a: &route.to,
-                b: &route.from,
+                a: route.to.clone(),
+                b: route.from.clone(),
             },
             route.distance,
         );
@@ -77,23 +77,35 @@ fn distances_from_routes(routes: &Vec<Route>) -> HashMap<Leg, i32> {
 //
 
 #[derive(Clone, PartialEq, Eq, Debug, Hash)]
-struct Leg<'a> {
-    a: &'a String,
-    b: &'a String,
+struct Leg {
+    a: String,
+    b: String,
 }
 
 //
 
 fn trip_distance(trip: Vec<&String>, distances: &HashMap<Leg, i32>) -> i32 {
-    let mut distance = 0;
-    for (a, b) in trip.iter().tuple_windows() {
-        let leg = &Leg {
-            a: a.clone(),
-            b: b.clone(),
-        };
-        distance += distances.get(leg).unwrap();
-    }
-    distance
+    // let mut distance = 0;
+    // for (a, b) in trip.iter().tuple_windows() {
+    //     let leg = &Leg {
+    //         a: (**a).clone(),
+    //         b: (**b).clone(),
+    //     };
+    //     distance += distances.get(leg).unwrap();
+    // }
+    // distance
+
+    trip.iter()
+        .tuple_windows()
+        .map(|(a, b)| {
+            distances
+                .get(&Leg {
+                    a: (**a).clone(),
+                    b: (**b).clone(),
+                })
+                .unwrap()
+        })
+        .sum()
 }
 
 //
@@ -103,14 +115,22 @@ pub fn part1() -> i32 {
     let cities = cities_from_routes(&routes);
     let distances = distances_from_routes(&routes);
 
-    let mut min_distance = i32::MAX;
-    for trip in cities.iter().permutations(cities.len()).unique() {
-        let distance = trip_distance(trip, &distances);
-        if distance < min_distance {
-            min_distance = distance;
-        }
-    }
-    min_distance
+    // let mut min_distance = i32::MAX;
+    // for trip in cities.iter().permutations(cities.len()).unique() {
+    //     let distance = trip_distance(trip, &distances);
+    //     if distance < min_distance {
+    //         min_distance = distance;
+    //     }
+    // }
+    // min_distance
+
+    cities
+        .iter()
+        .permutations(cities.len())
+        .unique()
+        .map(|trip| trip_distance(trip, &distances))
+        .min()
+        .unwrap()
 }
 
 pub fn part2() -> i32 {
@@ -118,14 +138,22 @@ pub fn part2() -> i32 {
     let cities = cities_from_routes(&routes);
     let distances = distances_from_routes(&routes);
 
-    let mut max_distance = i32::MIN;
-    for trip in cities.iter().permutations(cities.len()).unique() {
-        let distance = trip_distance(trip, &distances);
-        if distance > max_distance {
-            max_distance = distance;
-        }
-    }
-    max_distance
+    // let mut max_distance = i32::MIN;
+    // for trip in cities.iter().permutations(cities.len()).unique() {
+    //     let distance = trip_distance(trip, &distances);
+    //     if distance > max_distance {
+    //         max_distance = distance;
+    //     }
+    // }
+    // max_distance
+
+    cities
+        .iter()
+        .permutations(cities.len())
+        .unique()
+        .map(|trip| trip_distance(trip, &distances))
+        .max()
+        .unwrap()
 }
 
 #[cfg(test)]
