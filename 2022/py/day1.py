@@ -9,13 +9,13 @@ def read_input() -> Generator[List[int], None, None]:
         yield [int(line) for line in group.strip().split("\n")]
 
 
-def part1():
+def part1() -> int:
     return max(
         sum(group) for group in read_input()
     )
 
 
-def part2():
+def part2() -> int:
     return sum(
         sorted(
             (sum(group) for group in read_input()),
