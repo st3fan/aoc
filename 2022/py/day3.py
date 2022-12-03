@@ -47,13 +47,10 @@ def part1() -> int:
 
 def part2() -> int:
     return sum(
-        [sum(
-            reduce(
-                lambda a, b: a & b,
-                [rucksack.all_items() for rucksack in group]
-            )
+        chain.from_iterable(
+            [reduce(lambda a, b: a & b, [rucksack.all_items() for rucksack in group])
+                for group in chunked(read_input(), 3)]
         )
-        for group in chunked(read_input(), 3)]
     )
 
 
