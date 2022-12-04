@@ -10,11 +10,11 @@ class Range:
     start: int
     end: int
 
-    def contains(self, o: "Range") -> bool:
+    def contains(self: Self, o: Self) -> bool:
         return self.start >= o.start and self.end <= o.end \
             or o.start >= self.start and o.end <= self.end
 
-    def intersects(self, o: "Range") -> bool:
+    def intersects(self: Self, o: Self) -> bool:
         return self.start <= o.start <= self.end or self.start <= o.end <= self.end \
             or o.start <= self.start <= o.end or o.start <= self.end <= o.end
 
