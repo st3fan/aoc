@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.11
 
 
 from dataclasses import dataclass
-from typing import Generator, Tuple
+from typing import Generator, Self
 
 
 @dataclass(frozen=True)
@@ -18,10 +18,10 @@ class Range:
         return self.start <= o.start <= self.end or self.start <= o.end <= self.end \
             or o.start <= self.start <= o.end or o.start <= self.end <= o.end
 
-    @staticmethod
-    def from_string(s: str) -> "Range":
+    @classmethod
+    def from_string(cls, s: str) -> Self:
         start, end = s.split("-")
-        return Range(int(start), int(end))
+        return cls(int(start), int(end))
 
 
 @dataclass(frozen=True)
@@ -29,15 +29,15 @@ class Pair:
     a: Range
     b: Range
 
-    @staticmethod
-    def from_string(s: str) -> "Pair":
+    @classmethod
+    def from_string(cls, s: str) -> Self:
         left, right = s.strip().split(",")
-        return Pair(Range.from_string(left), Range.from_string(right))
+        return cls(Range.from_string(left), Range.from_string(right))
 
 
 def read_input() -> Generator[Pair, None, None]:
-    with open("day4.txt") as f:
-        for line in f.readlines():
+    with open("day4.txt") as file:
+        for line in file.readlines():
             yield Pair.from_string(line)
 
 
