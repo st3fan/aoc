@@ -4,14 +4,14 @@
 from dataclasses import dataclass
 from itertools import chain
 from typing import Generator, List, Set
-from functools import reduce
+
 from more_itertools import chunked
 
 
 def item_id(s: str) -> int:
-    if ord(s) >= ord('a') and ord(s) <= ord('z'):
-        return ord(s) - ord('a') + 1
-    return ord(s) - ord('A') + 27
+    if ord(s) >= ord("a") and ord(s) <= ord("z"):
+        return ord(s) - ord("a") + 1
+    return ord(s) - ord("A") + 27
 
 
 @dataclass
@@ -38,20 +38,17 @@ def read_input() -> Generator[Rucksack, None, None]:
 
 
 def part1() -> int:
-    return sum(
-        chain.from_iterable(
-            rucksack.unique_items() for rucksack in read_input()
-        )
-    )
+    return sum(chain.from_iterable(rucksack.unique_items() for rucksack in read_input()))
 
 
 def part2() -> int:
-    return sum(
-        chain.from_iterable(
-            [reduce(lambda a, b: a & b, [rucksack.all_items() for rucksack in group])
-                for group in chunked(read_input(), 3)]
-        )
-    )
+    # This only exists because functools.reduce has no type annotations
+    # and makes Pylance complain about all the things.
+    def _intersection(group: List[Rucksack]) -> Set[int]:
+        items = [sack.all_items() for sack in group]
+        return items[0] & items[1] & items[2]
+
+    return sum(chain.from_iterable(_intersection(group) for group in chunked(read_input(), 3)))
 
 
 if __name__ == "__main__":
