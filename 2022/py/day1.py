@@ -10,18 +10,11 @@ def read_input() -> Generator[List[int], None, None]:
 
 
 def part1() -> int:
-    return max(
-        sum(group) for group in read_input()
-    )
+    return max(sum(group) for group in read_input())
 
 
 def part2() -> int:
-    return sum(
-        sorted(
-            (sum(group) for group in read_input()),
-            reverse=True
-        )[:3]
-    )
+    return sum(sorted((sum(group) for group in read_input()), reverse=True)[:3])
 
 
 if __name__ == "__main__":
