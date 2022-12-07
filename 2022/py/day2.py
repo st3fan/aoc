@@ -19,7 +19,8 @@ class Shape(IntEnum):
                 return Shape.PAPER
             case "C" | "Z":
                 return Shape.SCISSORS
-        raise ValueError("invalid shape name")
+            case _:
+                raise ValueError("invalid shape name")
 
 
 class State(Enum):
@@ -36,7 +37,8 @@ class State(Enum):
                 return State.DRAW
             case "Z":
                 return State.WIN
-        raise ValueError(f"invalid state {c}")
+            case _:
+                raise ValueError(f"invalid state {c}")
 
 
 def read_input1() -> Generator[Tuple[Shape, Shape], None, None]:
@@ -48,7 +50,11 @@ def read_input1() -> Generator[Tuple[Shape, Shape], None, None]:
 def score1(opponent: Shape, player: Shape) -> int:
     if opponent == player:
         return player + 3
-    if (player, opponent) in {(Shape.ROCK, Shape.SCISSORS), (Shape.SCISSORS, Shape.PAPER), (Shape.PAPER, Shape.ROCK)}:
+    if (player, opponent) in {
+        (Shape.ROCK, Shape.SCISSORS),
+        (Shape.SCISSORS, Shape.PAPER),
+        (Shape.PAPER, Shape.ROCK),
+    }:
         return player + 6
     return player
 
