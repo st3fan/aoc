@@ -42,18 +42,12 @@ def part2() -> int:
     for r in range(6):
         for (x, xd) in enumerate(take(40, g)):
             if x in (sx - 1, sx, sx + 1):
-                rows[r][x] = "#"
+                rows[r][x] = "\u2588"
             sx += xd
-
-    for r in rows:
-        line = ""
-        for segment in chunked(r, 5):
-            line += "".join(segment) + "   "
-        print(line)
-
-    return 0
+        print("".join(rows[r]))
 
 
 if __name__ == "__main__":
     print("Part 1:", part1())
-    print("Part 2:", part2())
+    print("Part 2:")
+    part2()
