@@ -2,7 +2,7 @@
 
 
 from itertools import cycle
-from more_itertools import take, chunked
+from more_itertools import take
 from typing import Generator, List
 
 
@@ -34,7 +34,7 @@ def part1() -> int:
     return total
 
 
-def part2() -> int:
+def part2() -> None:
     g = beam_cycle_values(read_input())
     rows = [[" "] * 40 for _ in range(6)]
 
