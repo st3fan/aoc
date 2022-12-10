@@ -57,68 +57,8 @@ def adjecent(a: Position, b: Position) -> bool:
     return abs(a.x - b.x) in (0, 1) and abs(a.y - b.y) in (0, 1)
 
 
-def part1() -> int:
-    head = Position.zero()
-    tail = Position.zero()
-
-    tail_positions: Set[Tuple[int, int]] = set([(tail.x, tail.y)])
-
-    for instruction in read_input():
-        for _ in range(instruction.distance):
-
-            # Move the head
-            match instruction.direction:
-                case Direction.UP:
-                    head.y += 1
-                case Direction.DOWN:
-                    head.y -= 1
-                case Direction.LEFT:
-                    head.x -= 1
-                case Direction.RIGHT:
-                    head.x += 1
-
-            # Move the tail if it is not adjecent with the head
-            if not adjecent(head, tail):
-
-                if head.x == tail.x or head.y == tail.y:
-                    if head.x == tail.x:
-                        if head.y == tail.y + 2:
-                            tail.y += 1
-                        elif head.y == tail.y - 2:
-                            tail.y -= 1
-                    elif head.y == tail.y:
-                        if head.x == tail.x + 2:
-                            tail.x += 1
-                        elif head.x == tail.x - 2:
-                            tail.x -= 1
-
-                else:
-
-                    if head.y > tail.y:
-                        if head.x > tail.x:
-                            tail.x += 1
-                            tail.y += 1
-                        else:
-                            tail.x -= 1
-                            tail.y += 1
-                    elif head.y < tail.y:
-                        if head.x > tail.x:
-                            tail.x += 1
-                            tail.y -= 1
-                        else:
-                            tail.x -= 1
-                            tail.y -= 1
-                    else:
-                        raise Exception("Huh")
-
-            # Remember the tail position
-            tail_positions.add((tail.x, tail.y))
-
-    return len(tail_positions)
-
-
-def part2() -> int:
-    knots = [Position.zero() for _ in range(10)]
+def _knots(length: int) -> int:
+    knots = [Position.zero() for _ in range(length)]
 
     tail_positions: Set[Tuple[int, int]] = set([(0, 0)])
 
@@ -136,7 +76,7 @@ def part2() -> int:
                 case Direction.RIGHT:
                     knots[0].x += 1
 
-            for i in range(9):
+            for i in range(length - 1):
                 head = knots[i]
                 tail = knots[i + 1]
 
@@ -175,9 +115,17 @@ def part2() -> int:
                             raise Exception("Huh")
 
             # Remember the tail position
-            tail_positions.add((knots[9].x, knots[9].y))
+            tail_positions.add((knots[length - 1].x, knots[length - 1].y))
 
     return len(tail_positions)
+
+
+def part1() -> int:
+    return _knots(2)
+
+
+def part2() -> int:
+    return _knots(10)
 
 
 if __name__ == "__main__":
