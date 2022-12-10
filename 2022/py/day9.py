@@ -76,6 +76,7 @@ def _knots(length: int) -> int:
                 case Direction.RIGHT:
                     knots[0].x += 1
 
+            # Move each knot
             for i in range(length - 1):
                 head = knots[i]
                 tail = knots[i + 1]
@@ -94,25 +95,19 @@ def _knots(length: int) -> int:
                                 tail.x += 1
                             elif head.x == tail.x - 2:
                                 tail.x -= 1
-
                     else:
-
                         if head.y > tail.y:
+                            tail.y += 1
                             if head.x > tail.x:
                                 tail.x += 1
-                                tail.y += 1
                             else:
                                 tail.x -= 1
-                                tail.y += 1
                         elif head.y < tail.y:
+                            tail.y -= 1
                             if head.x > tail.x:
                                 tail.x += 1
-                                tail.y -= 1
                             else:
                                 tail.x -= 1
-                                tail.y -= 1
-                        else:
-                            raise Exception("Huh")
 
             # Remember the tail position
             tail_positions.add((knots[length - 1].x, knots[length - 1].y))
