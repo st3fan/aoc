@@ -25,13 +25,13 @@ def beam_cycle_values(instructions: list[None | int]) -> Generator[int, None, No
 
 
 def part1() -> int:
-    t: int = 0
+    total: int = 0
     x: int = 1
     for cycle, dx in enumerate(take(220, beam_cycle_values(read_input())), start=1):
         if cycle in (20, 60, 100, 140, 180, 220):
-            t += cycle * x
+            total += cycle * x
         x += dx
-    return t
+    return total
 
 
 def part2() -> int:
