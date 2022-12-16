@@ -2,107 +2,68 @@
 
 
 import json
-import re
 
 from dataclasses import dataclass
+from functools import cmp_to_key
 from typing import Any, Generator, List, Self
-from more_itertools import padded
 
 
-def _parse_list(s: str) -> List[Any]:
-    # return json.loads(re.sub(r"(\d+)", r"[\1]", s))
-    return json.loads(s)
-
-
-# def test_parse_list():
-#     assert _parse_list("[]") == []
-#     assert _parse_list("[1]") == [[1]]
-#     assert _parse_list("[1,2]") == [[1], [2]]
-#     assert _parse_list("[1,[], 3]") == [[1], [], [3]]
-#     assert _parse_list("[[], 2, 3]") == [[], [2], [3]]
-#     assert _parse_list("[[8, 7, 6]]") == [[[8], [7], [6]]]
-
-
-def _compare_listsx(l: List[Any], r: List[Any]) -> bool:
-    # print("COMPARING", l, r)
-    for left, right in zip(padded(l, None, max(len(l), len(r))), padded(r, None, max(len(l), len(r)))):
-        match (left, right):
-            case (int(left), int(right)):
-                if left > right:
-                    return False
-            case (None, int(right)):
-                return True
-            case (int(left), None):
-                return False
-            case (list(ll), list(rl)):
-                if not _compare_lists(ll, rl):
-                    return False
-            case (list(ll), int(ri)):
-                if not _compare_lists(ll, [ri]):
-                    return False
-            case (int(li), list(rl)):
-                if not _compare_lists([li], rl):
-                    return False
-            case _:
-                raise Exception(f"Don't know how to compare {left} vs {right}")
-    return True
-
-
-def _compare_lists(left: List[Any] | int, right: List[Any] | int) -> bool:
-    # print("COMPARING", left, "WITH", right)
-    if isinstance(left, list) and isinstance(right, list):
-        for i in range(max(len(left), len(right))):
-            # If the left list ran out of items, we're good
-            if len(left) < len(right) and i == len(left):
-                return True
-            # If the right list ran out of items, we're not good
-            elif len(right) < len(left) and i == len(right):
-                return False
-            # If both items are integers then the lower should come first
-            elif isinstance(left[i], int) and isinstance(right[i], int):
-                if left[i] < right[i]:
-                    return True
-                elif left[i] > right[i]:
-                    return False
+def _compare_lists(left: List[Any], right: List[Any]) -> int:
+    print("COMPARING", left, "WITH", right)
+    for i in range(max(len(left), len(right))):
+        # If the left list ran out of items, we're good
+        if len(left) < len(right) and i == len(left):
+            return 1
+        # If the right list ran out of items, we're not good
+        if len(right) < len(left) and i == len(right):
+            return -1
+        # If both items are integers then the lower should come first
+        if isinstance(left[i], int) and isinstance(right[i], int):
+            if right[i] != left[i]:
+                return right[i] - left[i]
+        else:
             # If one item is an int and the other is a list ...
-            elif isinstance(left[i], int) and isinstance(right[i], list):
-                return _compare_lists([left[i]], right[i])
-            elif isinstance(left[i], list) and isinstance(right[i], int):
-                return _compare_lists(left[i], [right[i]])
+            l = left[i] if isinstance(left[i], list) else [left[i]]
+            r = right[i] if isinstance(right[i], list) else [right[i]]
+            if (result := _compare_lists(l, r)) != 0:
+                return result
+    return 0
 
-    return False
+
+def test_compare_lists():
+    assert _compare_lists([1, 1, 3, 1, 1], [1, 1, 3, 1, 1]) == 0
 
 
 def test_compare_lists1():
-    assert _compare_lists([1, 1, 3, 1, 1], [1, 1, 5, 1, 1])
+    assert _compare_lists([1, 1, 3, 1, 1], [1, 1, 5, 1, 1]) == 1
 
 
 def test_compare_lists2():
-    assert _compare_lists([[1], [2, 3, 4]], [[1], 4])
+    assert _compare_lists([[1], [2, 3, 4]], [[1], 4]) == 1
 
 
 def test_compare_lists3():
-    assert _compare_lists([9], [[8, 7, 6]]) == False
+    assert _compare_lists([9], [[8, 7, 6]]) == -1
 
 
 def test_compare_lists4():
-    assert _compare_lists([[4, 4], 4, 4], [[4, 4], 4, 4, 4])
+    assert _compare_lists([[4, 4], 4, 4], [[4, 4], 4, 4, 4]) == 1
 
 
 def test_compare_lists5():
-    assert _compare_lists([7, 7, 7, 7], [7, 7, 7]) == False
+    assert _compare_lists([7, 7, 7, 7], [7, 7, 7]) == 1
 
 
 def test_compare_lists6():
-    assert _compare_lists([], [3])
+    assert _compare_lists([], [3]) == 1
 
 
 def test_compare_lists7():
-    assert _compare_lists([[[]]], [[]]) == False
+    assert _compare_lists([[[]]], [[]]) == -1
 
 
 def test_compare_lists8():
-    assert _compare_lists([1, [2, [3, [4, [5, 6, 7]]]], 8, 9], [1, [2, [3, [4, [5, 6, 0]]]], 8, 9]) == False
+    assert _compare_lists([1, [2, [3, [4, [5, 6, 7]]]], 8, 9], [1, [2, [3, [4, [5, 6, 0]]]], 8, 9]) == -1
 
 
 @dataclass
@@ -111,12 +72,12 @@ class Pair:
     right: List[Any]
 
     def correct(self) -> bool:
-        return _compare_lists(self.left, self.right)
+        return _compare_lists(self.left, self.right) == True
 
     @classmethod
     def from_str(cls, s: str) -> Self:
         left, right = s.split("\n")
-        return cls(_parse_list(left), _parse_list(right))
+        return cls(json.loads(left), json.loads(right))
 
 
 def read_input() -> Generator[Pair, None, None]:
@@ -125,11 +86,18 @@ def read_input() -> Generator[Pair, None, None]:
 
 
 def part1() -> int:
-    return sum(i for i, pair in enumerate(read_input(), start=1) if _compare_lists(pair.left, pair.right))
+    return sum(i for i, pair in enumerate(read_input(), start=1) if _compare_lists(pair.left, pair.right) > 0)
 
 
 def part2() -> int:
-    return 0
+    packets = [[[2]], [[6]]]
+    for packet in read_input():
+        packets.append(packet.left)
+        packets.append(packet.right)
+
+    packets = sorted(packets, key=cmp_to_key(_compare_lists), reverse=True)
+
+    return (packets.index([[2]]) + 1) * (packets.index([[6]]) + 1)
 
 
 if __name__ == "__main__":
