@@ -30,42 +30,6 @@ def _compare_lists(left: List[Any], right: List[Any]) -> int:
     return 0
 
 
-def test_compare_lists():
-    assert _compare_lists([1, 1, 3, 1, 1], [1, 1, 3, 1, 1]) == 0
-
-
-def test_compare_lists1():
-    assert _compare_lists([1, 1, 3, 1, 1], [1, 1, 5, 1, 1]) == 1
-
-
-def test_compare_lists2():
-    assert _compare_lists([[1], [2, 3, 4]], [[1], 4]) == 1
-
-
-def test_compare_lists3():
-    assert _compare_lists([9], [[8, 7, 6]]) == -1
-
-
-def test_compare_lists4():
-    assert _compare_lists([[4, 4], 4, 4], [[4, 4], 4, 4, 4]) == 1
-
-
-def test_compare_lists5():
-    assert _compare_lists([7, 7, 7, 7], [7, 7, 7]) == 1
-
-
-def test_compare_lists6():
-    assert _compare_lists([], [3]) == 1
-
-
-def test_compare_lists7():
-    assert _compare_lists([[[]]], [[]]) == -1
-
-
-def test_compare_lists8():
-    assert _compare_lists([1, [2, [3, [4, [5, 6, 7]]]], 8, 9], [1, [2, [3, [4, [5, 6, 0]]]], 8, 9]) == -1
-
-
 @dataclass
 class Pair:
     left: List[Any]
