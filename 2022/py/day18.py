@@ -2,7 +2,7 @@
 
 
 from dataclasses import dataclass
-from typing import List, Self
+from typing import List, Self, Set
 
 
 @dataclass(frozen=True)
@@ -27,18 +27,21 @@ class Cube:
         ]
 
 
-def read_input() -> List[Cube]:
-    return [Cube.from_str(line.strip()) for line in open("day18.txt").readlines()]
+def read_input() -> Set[Cube]:
+    return set(Cube.from_str(line.strip()) for line in open("day18.txt").readlines())
 
 
-def part1() -> int:
-    cubes: set[Cube] = set(read_input())
+def outer_surface(cubes: set[Cube]) -> int:
     total = 0
     for cube in cubes:
         for adj in cube.adjecents():
             if adj not in cubes:
                 total += 1
     return total
+
+
+def part1() -> int:
+    return outer_surface(read_input())
 
 
 def part2() -> int:
