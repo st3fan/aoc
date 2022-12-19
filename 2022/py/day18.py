@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 
 
-from typing import List, Set, Tuple
+from typing import List, Set, Tuple, TypeAlias
 
 import numpy as np
 from scipy import ndimage
 
+Cube: TypeAlias = Tuple[int, int, int]
 
-def adjecents(cube: Tuple[int, int, int]) -> List[Tuple[int, int, int]]:
+
+def adjecents(cube: Cube) -> List[Cube]:
     return [
         (cube[0] - 1, cube[1] + 0, cube[2] + 0),
         (cube[0] + 1, cube[1] + 0, cube[2] + 0),
@@ -18,15 +20,15 @@ def adjecents(cube: Tuple[int, int, int]) -> List[Tuple[int, int, int]]:
     ]
 
 
-def read_input() -> Set[Tuple[int, int, int]]:
-    def _parse_cube(s: str) -> Tuple[int, int, int]:
+def read_input() -> Set[Cube]:
+    def _parse_cube(s: str) -> Cube:
         c = s.split(",")
         return (int(c[0]), int(c[1]), int(c[2]))
 
     return set(_parse_cube(line) for line in open("day18.txt").readlines())
 
 
-def outer_surface(cubes: Set[Tuple[int, int, int]]) -> int:
+def outer_surface(cubes: Set[Cube]) -> int:
     return sum(sum(adj not in cubes for adj in adjecents(cube)) for cube in cubes)
 
 
@@ -35,7 +37,7 @@ def part1() -> int:
 
 
 def part2() -> int:
-    cubes: Set[Tuple[int, int, int]] = read_input()
+    cubes: Set[Cube] = read_input()
 
     mx = max(c[0] for c in cubes) + 1
     my = max(c[1] for c in cubes) + 1
@@ -46,9 +48,9 @@ def part2() -> int:
         droplet[cube] = 1
 
     pockets = ndimage.binary_fill_holes(droplet) - droplet
-    inside_cubes = set([i for i, v in np.ndenumerate(pockets) if v != 0])
+    inside_cubes: Set[Cube] = set([i for i, v in np.ndenumerate(pockets) if v != 0])
 
-    return part1() - outer_surface(inside_cubes)
+    return outer_surface(cubes) - outer_surface(inside_cubes)
 
 
 if __name__ == "__main__":
