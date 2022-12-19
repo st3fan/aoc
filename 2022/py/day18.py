@@ -27,7 +27,7 @@ def read_input() -> Set[Tuple[int, int, int]]:
 
 
 def outer_surface(cubes: Set[Tuple[int, int, int]]) -> int:
-    return sum(sum(1 for adj in adjecents(cube) if adj not in cubes) for cube in cubes)
+    return sum(sum(adj not in cubes for adj in adjecents(cube)) for cube in cubes)
 
 
 def part1() -> int:
@@ -41,12 +41,12 @@ def part2() -> int:
     my = max(c[1] for c in cubes) + 1
     mz = max(c[2] for c in cubes) + 1
 
-    array = np.zeros((mx, my, mz), dtype=int)
+    droplet = np.zeros((mx, my, mz), dtype=int)
     for cube in cubes:
-        array[cube] = 1
+        droplet[cube] = 1
 
-    inside = ndimage.binary_fill_holes(array) - array
-    inside_cubes = set([i for i, v in np.ndenumerate(inside) if v != 0])
+    pockets = ndimage.binary_fill_holes(droplet) - droplet
+    inside_cubes = set([i for i, v in np.ndenumerate(pockets) if v != 0])
 
     return part1() - outer_surface(inside_cubes)
 
