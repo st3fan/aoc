@@ -1,66 +1,33 @@
 #!/usr/bin/env python
 
 
-from dataclasses import dataclass
-from typing import List, NamedTuple, Self, Set
+from typing import List, Set, Tuple
 
 import numpy as np
 from scipy import ndimage
 
-# @dataclass(frozen=True)
-# class Cube:
-#     x: int
-#     y: int
-#     z: int
 
-#     @classmethod
-#     def from_str(cls, s: str) -> Self:
-#         c = s.split(",")
-#         return cls(int(c[0]), int(c[1]), int(c[2]))
-
-#     def adjecents(self) -> List[Self]:
-#         return [
-#             Cube(self.x - 1, self.y, self.z),
-#             Cube(self.x + 1, self.y, self.z),
-#             Cube(self.x, self.y - 1, self.z),
-#             Cube(self.x, self.y + 1, self.z),
-#             Cube(self.x, self.y, self.z - 1),
-#             Cube(self.x, self.y, self.z + 1),
-#         ]
+def adjecents(cube: Tuple[int, int, int]) -> List[Tuple[int, int, int]]:
+    return [
+        (cube[0] - 1, cube[1] + 0, cube[2] + 0),
+        (cube[0] + 1, cube[1] + 0, cube[2] + 0),
+        (cube[0] + 0, cube[1] - 1, cube[2] + 0),
+        (cube[0] + 0, cube[1] + 1, cube[2] + 0),
+        (cube[0] + 0, cube[1] + 0, cube[2] - 1),
+        (cube[0] + 0, cube[1] + 0, cube[2] + 1),
+    ]
 
 
-class Cube(NamedTuple):
-    x: int
-    y: int
-    z: int
-
-    @classmethod
-    def from_str(cls, s: str) -> Self:
+def read_input() -> Set[Tuple[int, int, int]]:
+    def _parse_cube(s: str) -> Tuple[int, int, int]:
         c = s.split(",")
-        return cls(int(c[0]), int(c[1]), int(c[2]))
+        return (int(c[0]), int(c[1]), int(c[2]))
 
-    def adjecents(self) -> List[Self]:
-        return [
-            Cube(self.x - 1, self.y, self.z),
-            Cube(self.x + 1, self.y, self.z),
-            Cube(self.x, self.y - 1, self.z),
-            Cube(self.x, self.y + 1, self.z),
-            Cube(self.x, self.y, self.z - 1),
-            Cube(self.x, self.y, self.z + 1),
-        ]
+    return set(_parse_cube(line) for line in open("day18.txt").readlines())
 
 
-def read_input() -> Set[Cube]:
-    return set(Cube.from_str(line.strip()) for line in open("day18.txt").readlines())
-
-
-def outer_surface(cubes: set[Cube]) -> int:
-    total = 0
-    for cube in cubes:
-        for adj in cube.adjecents():
-            if adj not in cubes:
-                total += 1
-    return total
+def outer_surface(cubes: Set[Tuple[int, int, int]]) -> int:
+    return sum(sum(1 for adj in adjecents(cube) if adj not in cubes) for cube in cubes)
 
 
 def part1() -> int:
@@ -68,24 +35,18 @@ def part1() -> int:
 
 
 def part2() -> int:
-    cubes: Set[Cube] = read_input()
+    cubes: Set[Tuple[int, int, int]] = read_input()
 
-    mx = max(c.x for c in cubes) + 1
-    my = max(c.y for c in cubes) + 1
-    mz = max(c.z for c in cubes) + 1
+    mx = max(c[0] for c in cubes) + 1
+    my = max(c[1] for c in cubes) + 1
+    mz = max(c[2] for c in cubes) + 1
 
     array = np.zeros((mx, my, mz), dtype=int)
     for cube in cubes:
         array[cube] = 1
 
-    inside = ndimage.binary_fill_holes(array).astype(int) - array
-
-    inside_cubes: Set[Cube] = set()
-    for x in range(mx):
-        for y in range(my):
-            for z in range(mz):
-                if inside[x, y, z] != 0:
-                    inside_cubes.add(Cube(x, y, z))
+    inside = ndimage.binary_fill_holes(array) - array
+    inside_cubes = set([i for i, v in np.ndenumerate(inside) if v != 0])
 
     return part1() - outer_surface(inside_cubes)
 
