@@ -37,20 +37,16 @@ def part1() -> int:
 
 
 def part2() -> int:
-    cubes: Set[Cube] = read_input()
+    all_cubes: Set[Cube] = read_input()
 
-    mx = max(c[0] for c in cubes) + 1
-    my = max(c[1] for c in cubes) + 1
-    mz = max(c[2] for c in cubes) + 1
-
-    droplet = np.zeros((mx, my, mz), dtype=int)
-    for cube in cubes:
+    droplet = np.zeros((100, 100, 100), dtype=int)
+    for cube in all_cubes:
         droplet[cube] = 1
 
     pockets = ndimage.binary_fill_holes(droplet) - droplet
     inside_cubes: Set[Cube] = set([i for i, v in np.ndenumerate(pockets) if v != 0])
 
-    return outer_surface(cubes) - outer_surface(inside_cubes)
+    return outer_surface(all_cubes) - outer_surface(inside_cubes)
 
 
 if __name__ == "__main__":
