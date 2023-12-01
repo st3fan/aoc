@@ -14,38 +14,11 @@ def part1() -> int:
     return sum([int(digits[0] + digits[-1]) for digits in read_input1()])
 
 
-def replace_numbers(s: str) -> str:
-    # for _ in range(10):
-    #     s = s.replace("oneight", "one_eight")
-    #     s = s.replace("threeight", "three_eight")
-    #     s = s.replace("fiveight", "five_eight")
-    #     s = s.replace("sevenine", "seven_nine")
-    #     s = s.replace("eightwo", "eight_two")
-    #     s = s.replace("eighthree", "eight_three")
-    #     s = s.replace("nineight", "nine_eight")
-
-    r = ""
-    numbers = ("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
-    for p in re.split(r"(one|two|three|four|five|six|seven|eight|nine)", s):
-        if p in numbers:
-            r += str(numbers.index(p)+1)
-        else:
-            r += p
-    return r
-
-
-# def read_input2() -> Generator[List[str], None, None]:
-#     for line in open("day1.txt").read().strip().split("\n"):
-#         yield [c for c in replace_numbers(line) if c.isdigit()]
-
-
-# def part2() -> int:
-#     return sum([int(digits[0] + digits[-1]) for digits in read_input2()])
-
-
 def read_input2() -> List[str]:
     return open("day1.txt").read().strip().split("\n")
 
+
+# I could not get a replacement function to work so I did the dumbest thing instead :-/
 
 def first_number(line: str) -> int:
     numbers = ("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
