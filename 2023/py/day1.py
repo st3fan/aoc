@@ -5,39 +5,36 @@ import re
 from typing import Generator, List
 
 
-def read_input1() -> Generator[List[str], None, None]:
+def read_input1() -> Generator[List[int], None, None]:
     for line in open("day1.txt").read().strip().split("\n"):
-        yield [c for c in line if c.isdigit()]
+        yield [int(c) for c in line if c.isdigit()]
 
 
 def part1() -> int:
-    return sum([int(digits[0] + digits[-1]) for digits in read_input1()])
+    return sum([10*digits[0] + digits[-1] for digits in read_input1()])
 
 
 def read_input2() -> List[str]:
     return open("day1.txt").read().strip().split("\n")
 
 
-# I could not get a replacement function to work so I did the dumbest thing instead :-/
+DIGITS = {"1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9,
+          "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9}
+
 
 def first_number(line: str) -> int:
-    numbers = ("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
-    for p in re.split(r"(one|two|three|four|five|six|seven|eight|nine|\d)", line):
-        if p.isdigit():
-            return int(p)
-        if p in numbers:
-            return numbers.index(p)+1
+    for n in range(len(line)+1):
+        for digit, value in DIGITS.items():
+            if line[:n].find(digit) != -1:
+                return value
     return 0
 
 
 def last_number(line: str) -> int:
-    line = "".join(reversed(line))
-    numbers = ("eno", "owt", "eerht", "ruof", "evif", "xis", "neves", "thgie", "enin")
-    for p in re.split(r"(eno|owt|eerht|ruof|evif|xis|neves|thgie|enin|\d)", line):
-        if p.isdigit():
-            return int(p)
-        if p in numbers:
-            return numbers.index(p)+1
+    for n in range(len(line)-1, -1, -1):
+        for digit, value in DIGITS.items():
+            if line[n:].find(digit) != -1:
+                return value
     return 0
 
 
