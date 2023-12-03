@@ -3,6 +3,7 @@
 
 from dataclasses import dataclass
 from collections import defaultdict
+from operator import mul
 from pathlib import Path
 import re
 from typing import Dict, Generator, List, Self, Set, Tuple
@@ -68,30 +69,25 @@ class Schematic:
 
 
 def part1() -> int:
-    total = 0
     schematic = Schematic.from_file(Path("day3.txt"))
-    for (part_number, symbols) in schematic.part_numbers():
-        print(part_number, symbols)
-        if len(symbols):
-            total += part_number.value
-    return total
+    return sum(part_number.value for (part_number, symbols) in schematic.part_numbers() if len(symbols))
 
 
 def part2() -> int:
     schematic = Schematic.from_file(Path("day3.txt"))
 
-    part_numbers_by_gear_position: Dict[Position, Set[PartNumber]] = defaultdict(set)
+    part_numbers_by_gear_position: Dict[Position, List[PartNumber]] = defaultdict(list)
     for (part_number, symbols) in schematic.part_numbers():
         for symbol in symbols:
             if symbol.c == GEAR:
-                part_numbers_by_gear_position[symbol.p].add(part_number)
+                part_numbers_by_gear_position[symbol.p].append(part_number)
 
     total = 0
     for _, part_numbers in part_numbers_by_gear_position.items():
         if len(part_numbers) == 2:
-            all = list(part_numbers)
-            total += all[0].value * all[1].value
+            total += part_numbers[0].value * part_numbers[1].value
     return total
+
 
 if __name__ == "__main__":
     print("Part 1:", part1())
