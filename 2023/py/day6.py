@@ -2,6 +2,9 @@
 
 
 from dataclasses import dataclass
+from functools import reduce
+import itertools
+from operator import mul
 from typing import List
 
 
@@ -25,25 +28,24 @@ def read_input2() -> Race:
         return Race(int(t), int(d))
 
 
-def calculate_distance(total_time: int, hold_time: int) -> int:
+def distance(total_time: int, hold_time: int) -> int:
     return (total_time - hold_time) * hold_time
 
 
 def part1():
-    r = 1
-    for race in read_input1():
-        n = 0
-        for hold_time in range(race.time):
-            if calculate_distance(race.time, hold_time) > race.distance:
-                n += 1
-        r *= n
-    return r
+    return reduce(
+        mul,
+        (
+            sum(distance(r.time, hold_time) > r.distance for hold_time in range(r.time))
+            for r in read_input1()
+        ),
+    )
 
 
 def part2():
     race = read_input2()
     for hold_time in range(race.time):
-        if calculate_distance(race.time, hold_time) > race.distance:
+        if distance(race.time, hold_time) > race.distance:
             return race.time - 2 * hold_time + 1
 
 
