@@ -4,10 +4,9 @@
 from dataclasses import dataclass
 from functools import reduce
 from itertools import cycle
+from math import lcm
 from operator import mul
 from typing import Callable, Self, Dict, Tuple
-
-from sympy import lcm
 
 
 @dataclass
@@ -54,7 +53,7 @@ def part1() -> int:
 def part2() -> int:
     ins, nodes = read_input()
     return lcm(
-        [
+        *[
             steps(ins, nodes, id, lambda v: v.endswith("Z"))
             for id in nodes.keys()
             if id.endswith("A")
