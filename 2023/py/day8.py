@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from functools import reduce
 from itertools import cycle
 from operator import mul
-from typing import Self, Dict, Tuple
+from typing import Callable, Self, Dict, Tuple
 
 from sympy import lcm
 
@@ -31,7 +31,9 @@ def read_input() -> Tuple[str, Dict[str, Node]]:
     }
 
 
-def steps(instructions: str, nodes: Dict[str, Node], start: str, f) -> int:
+def steps(
+    instructions: str, nodes: Dict[str, Node], start: str, f: Callable[[str], bool]
+) -> int:
     current = start
     for steps, ins in enumerate(cycle(instructions), start=1):
         match ins:
