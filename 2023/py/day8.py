@@ -31,35 +31,33 @@ def read_input() -> Tuple[str, Dict[str, Node]]:
     }
 
 
-def part1() -> int:
-    instructions, nodes = read_input()
-    current = "AAA"
+def steps(instructions: str, nodes: Dict[str, Node], start: str, f) -> int:
+    current = start
     for steps, ins in enumerate(cycle(instructions), start=1):
         match ins:
             case "L":
                 current = nodes[current].left
             case "R":
                 current = nodes[current].right
-        if current == "ZZZ":
+        if f(current):
             return steps
     return 0
 
 
-def part2() -> int:
-    def _steps(instructions: str, nodes: Dict[str, Node], start: str) -> int:
-        current = start
-        for steps, ins in enumerate(cycle(instructions), start=1):
-            match ins:
-                case "L":
-                    current = nodes[current].left
-                case "R":
-                    current = nodes[current].right
-            if current.endswith("Z"):
-                return steps
-        return 0
+def part1() -> int:
+    instructions, nodes = read_input()
+    return steps(instructions, nodes, "AAA", lambda id: id == "ZZZ")
 
+
+def part2() -> int:
     ins, nodes = read_input()
-    return lcm(_steps(ins, nodes, id) for id in nodes.keys() if id.endswith("A"))
+    return lcm(
+        [
+            steps(ins, nodes, id, lambda v: v.endswith("Z"))
+            for id in nodes.keys()
+            if id.endswith("A")
+        ]
+    )
 
 
 if __name__ == "__main__":
