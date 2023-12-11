@@ -154,7 +154,7 @@ def part2() -> int:
     # Create an image
 
     TILE_SIZE = 3
-    
+
     WHITE = (255, 255, 255)
     RED = (255, 0, 0)
 
@@ -165,12 +165,12 @@ def part2() -> int:
         return image
 
     TILE_SHAPES = {
-        "|": build_tile([(1,0), (1,1), (1,2)]),
-        "-": build_tile([(0,1), (1,1), (2,1)]),
-        "7": build_tile([(0,1), (1,1), (1,2)]),
-        "F": build_tile([(1,1), (2,1), (1,2)]),
-        "J": build_tile([(1,0), (0,1), (1,1)]),
-        "L": build_tile([(1,0), (1,1), (2,1)]),
+        "|": build_tile([(1, 0), (1, 1), (1, 2)]),
+        "-": build_tile([(0, 1), (1, 1), (2, 1)]),
+        "7": build_tile([(0, 1), (1, 1), (1, 2)]),
+        "F": build_tile([(1, 1), (2, 1), (1, 2)]),
+        "J": build_tile([(1, 0), (0, 1), (1, 1)]),
+        "L": build_tile([(1, 0), (1, 1), (2, 1)]),
     }
 
     image = Image.new("RGB", (grid.width * TILE_SIZE, grid.height * TILE_SIZE), WHITE)
@@ -181,7 +181,7 @@ def part2() -> int:
             t = grid.resolve_start_tile(p)
         tile = TILE_SHAPES[t]
         image.paste(tile, box=(p.x * TILE_SIZE, p.y * TILE_SIZE))
-    
+
     floodfill(image, (1, 1), RED)
 
     image.save("day10.png")
@@ -192,8 +192,15 @@ def part2() -> int:
 
     for y in range(grid.height):
         for x in range(grid.width):
-            pixel = image.crop((x * TILE_SIZE, y * TILE_SIZE, x * TILE_SIZE + TILE_SIZE, y * TILE_SIZE + TILE_SIZE))
-            if pixel.getpixel((1,1)) == WHITE:
+            pixel = image.crop(
+                (
+                    x * TILE_SIZE,
+                    y * TILE_SIZE,
+                    x * TILE_SIZE + TILE_SIZE,
+                    y * TILE_SIZE + TILE_SIZE,
+                )
+            )
+            if pixel.getpixel((1, 1)) == WHITE:
                 total += 1
 
     return total
