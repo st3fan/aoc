@@ -5,6 +5,9 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import List, Self
 
+from PIL import Image
+from PIL.ImageDraw import floodfill
+
 
 class Direction(Enum):
     N = auto()
@@ -49,6 +52,11 @@ class Grid:
     def __post_init__(self):
         self.width = len(self.data[0])
         self.height = len(self.data)
+
+    def clear(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                self.data[y][x] = ""
 
     def find_start(self) -> Position:
         for y in range(self.height):
@@ -129,5 +137,68 @@ def part1() -> int:
     return len(seen) // 2
 
 
+def part2() -> int:
+    grid = Grid.from_path("day10.txt")
+    position = grid.find_start()
+    seen = set([position])
+
+    # Same as part1
+    while True:
+        for position in grid.next_positions(position):
+            if position not in seen:
+                seen.add(position)
+                break
+        else:
+            break
+
+    # Create an image
+
+    TILE_SIZE = 3
+    
+    WHITE = (255, 255, 255)
+    RED = (255, 0, 0)
+
+    def build_tile(pixels) -> Image:
+        image = Image.new("RGB", (TILE_SIZE, TILE_SIZE), WHITE)
+        for xy in pixels:
+            image.putpixel(xy, RED)
+        return image
+
+    TILE_SHAPES = {
+        "|": build_tile([(1,0), (1,1), (1,2)]),
+        "-": build_tile([(0,1), (1,1), (2,1)]),
+        "7": build_tile([(0,1), (1,1), (1,2)]),
+        "F": build_tile([(1,1), (2,1), (1,2)]),
+        "J": build_tile([(1,0), (0,1), (1,1)]),
+        "L": build_tile([(1,0), (1,1), (2,1)]),
+    }
+
+    image = Image.new("RGB", (grid.width * TILE_SIZE, grid.height * TILE_SIZE), WHITE)
+
+    for p in seen:
+        t = grid.get(p)
+        if t == "S":
+            t = grid.resolve_start_tile(p)
+        tile = TILE_SHAPES[t]
+        image.paste(tile, box=(p.x * TILE_SIZE, p.y * TILE_SIZE))
+    
+    floodfill(image, (1, 1), RED)
+
+    image.save("day10.png")
+
+    # Count pixels
+
+    total = 0
+
+    for y in range(grid.height):
+        for x in range(grid.width):
+            pixel = image.crop((x * TILE_SIZE, y * TILE_SIZE, x * TILE_SIZE + TILE_SIZE, y * TILE_SIZE + TILE_SIZE))
+            if pixel.getpixel((1,1)) == WHITE:
+                total += 1
+
+    return total
+
+
 if __name__ == "__main__":
     print("Part 1:", part1())
+    print("Part 2:", part2())
