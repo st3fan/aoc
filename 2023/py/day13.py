@@ -7,16 +7,12 @@ from PIL import Image, ImageChops
 from PIL.ImageStat import Stat
 
 
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-
-
 def image_from_pattern(pattern: List[str]) -> Image.Image:
-    image = Image.new("RGB", (len(pattern[0]), len(pattern)), WHITE)
+    image = Image.new("1", (len(pattern[0]), len(pattern)), 0)
     for y in range(len(pattern)):
         for x in range(len(pattern[0])):
             if pattern[y][x] == "#":
-                image.putpixel((x, y), BLACK)
+                image.putpixel((x, y), 1)
     return image
 
 
@@ -26,14 +22,14 @@ def read_input() -> List[Image.Image]:
         return [image_from_pattern(pattern.split("\n")) for pattern in patterns]
 
 
-def images_are_equal(a: Image, b: Image) -> bool:
+def images_are_equal(a: Image.Image, b: Image.Image) -> bool:
     diff = ImageChops.difference(a, b)
     return not any(channel.getbbox() is not None for channel in diff.split())
 
 
 def count_different_pixels(a: Image.Image, b: Image.Image) -> bool:
     stat = Stat(ImageChops.difference(a, b)).sum
-    return stat[0] / 255
+    return stat[0]
 
 
 def find_mirror(image: Image.Image, flip=False) -> int | None:
