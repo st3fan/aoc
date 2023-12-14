@@ -181,10 +181,12 @@ def part2() -> int:
             t = grid.resolve_start_tile(p)
         tile = TILE_SHAPES[t]
         image.paste(tile, box=(p.x * TILE_SIZE, p.y * TILE_SIZE))
+    
+    image.save("day10-before.png")
 
     floodfill(image, (1, 1), RED)
 
-    image.save("day10.png")
+    image.save("day10-after.png")
 
     # Count pixels
 
