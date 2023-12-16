@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum, auto
@@ -18,7 +19,7 @@ class Position:
     x: int
     y: int
 
-    def peek(self, direction: Direction) -> "Position":
+    def peek(self, direction: Direction) -> Position:
         match direction:
             case Direction.N:
                 return Position(self.x, self.y - 1)
@@ -93,6 +94,11 @@ class Grid:
                 count += len(self.data[y][x].energized) != 0
         return count
 
+    def reset(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                self.data[y][x].energized.clear()
+
     @classmethod
     def from_path(cls, path: str) -> Self:
         with open(path) as f:
@@ -105,7 +111,7 @@ class Beam:
     position: Position
     direction: Direction
 
-    def move(self, grid: Grid) -> Self | None:
+    def move(self, grid: Grid) -> Beam | None:
         if tile := grid.get(self.position):
             match tile.type:
                 case TileType.EMPTY:
@@ -163,8 +169,7 @@ class Beam:
         return None
 
 
-def part1(position: Position, direction: Direction) -> int:
-    grid = Grid.from_path("day16.txt")
+def solve(grid: Grid, position: Position, direction: Direction) -> int:
     beams: List[Beam] = [Beam(position, direction)]
 
     while len(beams) != 0:
@@ -191,20 +196,26 @@ def part1(position: Position, direction: Direction) -> int:
     return grid.energized()
 
 
+def part1() -> int:
+    return solve(Grid.from_path("day16.txt"), Position(0, 0), Direction.E)
+
+
 def part2() -> int:
     grid = Grid.from_path("day16.txt")
     m = 0
     for x in range(grid.width):
-        m = max(m, part1(Position(x, 0), Direction.S))
-    for x in range(grid.width):
-        m = max(m, part1(Position(x, grid.height - 1), Direction.N))
+        m = max(m, solve(grid, Position(x, 0), Direction.S))
+        grid.reset()
+        m = max(m, solve(grid, Position(x, grid.height - 1), Direction.N))
+        grid.reset()
     for y in range(grid.height):
-        m = max(m, part1(Position(0, y), Direction.E))
-    for y in range(grid.height):
-        m = max(m, part1(Position(grid.width - 1, y), Direction.W))
+        m = max(m, solve(grid, Position(0, y), Direction.E))
+        grid.reset()
+        m = max(m, solve(grid, Position(grid.width - 1, y), Direction.W))
+        grid.reset()
     return m
 
 
 if __name__ == "__main__":
-    print("Part 1:", part1(Position(0, 0), Direction.E))
+    print("Part 1:", part1())
     print("Part 2:", part2())
