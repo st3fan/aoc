@@ -6,8 +6,8 @@
 
 import re
 from itertools import chain, combinations
+from multiprocessing import Pool
 from typing import List, Iterable
-
 
 #
 #    ?###???????? 3,2,1
@@ -57,9 +57,16 @@ def count_valid_combinations(line: str) -> int:
     return total
 
 
-if __name__ == "__main__":
-    total = 0
+def read_input() -> List[str]:
     with open("day12.txt") as f:
-        for line in f.readlines():
-            total += count_valid_combinations(line.strip())
-    print(total)
+        return [line.strip() for line in f.readlines()]
+
+
+def part1() -> int:
+    input = read_input()
+    with Pool(processes=8) as pool:
+        return sum(pool.map(count_valid_combinations, input))
+
+
+if __name__ == "__main__":
+    print("Part 1:", part1())
