@@ -5,9 +5,7 @@ from itertools import pairwise
 
 
 def read_input(path):
-    with open(path) as fp:
-        for line in fp.readlines():
-            yield [int(v) for v in line.split()]
+    return [[int(v) for v in line.split()] for line in open(path).readlines()]
 
 
 def check(report) -> bool:
@@ -18,8 +16,6 @@ def check(report) -> bool:
 
 
 def dampened_check(report):
-    if check(report):
-        return True
     for i in range(0, len(report)):
         c = report.copy()
         del c[i]
@@ -30,4 +26,4 @@ def dampened_check(report):
 
 if __name__ == "__main__":
     print("Part1:", sum(check(report) for report in read_input("day2.txt")))
-    print("Part2:", sum(dampened_check(report) for report in read_input("day2.txt")))
+    print("Part2:", sum(check(report) or dampened_check(report) for report in read_input("day2.txt")))
