@@ -21,9 +21,8 @@ def part2(input):
                 e = True
             case ["don't", "", ""]:
                 e = False
-            case ["mul", a, b]:
-                if e:
-                    t += int(a) * int(b)
+            case ["mul", a, b] if e:
+                t += int(a) * int(b)
     return t
 
 
