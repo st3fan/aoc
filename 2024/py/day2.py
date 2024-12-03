@@ -9,19 +9,11 @@ def read_input(path):
 
 
 def check(report) -> bool:
-    for a, b in pairwise(report):
-        if not (1 <= abs(a - b) <= 3):
-            return False
-    return not sorted(report, reverse=(report[0] > report[1])) != report
+    return not any(not (1 <= abs(a - b) <= 3) for a, b in pairwise(report)) and not sorted(report, reverse=(report[0] > report[1])) != report
 
 
 def dampened_check(report):
-    for i in range(0, len(report)):
-        c = report.copy()
-        del c[i]
-        if check(c):
-            return True
-    return False
+    return any(check(report[:i] + report[i + 1 :]) for i in range(0, len(report)))
 
 
 if __name__ == "__main__":
