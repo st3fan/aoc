@@ -2,42 +2,33 @@
 
 from functools import cmp_to_key
 
-RULES = []
 
-with open("day5_rules.txt") as fp:
-    for line in fp.readlines():
-        a, b = line.strip().split("|")
-        RULES.append((int(a), int(b)))
-
-
-def elf_compare(a, b):
-    if (a, b) in RULES:
-        return -1
-    else:
+def make_elf_compare(rules):
+    def elf_compare(a, b):
+        if [a, b] in rules:
+            return -1
         return 1
 
+    return elf_compare
 
-def elf_sort(pages):
-    return sorted(pages, key=cmp_to_key(elf_compare))
+
+def elf_sort(pages, rules):
+    return sorted(pages, key=cmp_to_key(make_elf_compare(rules)))
+
+
+def read_rules(path: str) -> list[list[int]]:
+    with open(path) as fp:
+        return [[int(v) for v in line.split("|")] for line in fp]
+
+
+def read_pages(path: str) -> list[list[int]]:
+    with open(path) as fp:
+        return [[int(v) for v in line.split(",")] for line in fp]
 
 
 if __name__ == "__main__":
-    pages = []
-    with open("day5_pages.txt") as fp:
-        for line in fp.readlines():
-            p = line.strip().split(",")
-            pages.append([int(v) for v in p])
+    rules = read_rules("day5_rules.txt")
+    pages = read_pages("day5_pages.txt")
 
-    t = 0
-    for p in pages:
-        print(p, " => ", elf_sort(p))
-        if p == elf_sort(p):
-            t += p[len(p) // 2]
-    print("Part1:", t)
-
-    t = 0
-    for p in pages:
-        print(p, " => ", elf_sort(p))
-        if p != (good := elf_sort(p)):
-            t += good[len(good) // 2]
-    print("Part2:", t)
+    print("Part1:", sum(p[len(p) // 2] for p in pages if p == elf_sort(p, rules)))
+    print("Part2:", sum(good[len(good) // 2] for p in pages if p != (good := elf_sort(p, rules))))
