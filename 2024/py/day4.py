@@ -21,9 +21,8 @@ def check_shape(grid: Grid[str], x: int, y: int, shape: Grid[str]) -> bool:
     for sx in range(shape.width):
         for sy in range(shape.height):
             c = shape.get(Position(sx, sy))
-            if c != ".":
-                if grid.get(Position(x + sx, y + sy)) != c:
-                    return False
+            if c != "." and grid.get(Position(x + sx, y + sy)) != c:
+                return False
     return True
 
 
