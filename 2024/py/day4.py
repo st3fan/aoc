@@ -42,13 +42,11 @@ if __name__ == "__main__":
     shape2 = Grid.from_file("day4_shape2.txt", lambda v: v)
     shape3 = Grid.from_file("day4_shape3.txt", lambda v: v)
     shape4 = Grid.from_file("day4_shape4.txt", lambda v: v)
-    shape5 = Grid.from_file("day4_shape5.txt", lambda v: v)
-    shape6 = Grid.from_file("day4_shape6.txt", lambda v: v)
 
     total = 0
-    for x in range(grid.width - 3):
-        for y in range(grid.height - 3):
-            for shape in (shape1, shape2, shape3, shape4, shape5, shape6):
+    for x in range(grid.width - 2):
+        for y in range(grid.height - 2):
+            for shape in (shape1, shape2, shape3, shape4):
                 if check_shape(grid, x, y, shape):
                     total += 1
     print("Part2:", total)
