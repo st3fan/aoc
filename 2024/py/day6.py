@@ -38,7 +38,7 @@ def part1():
                 # We actually moved
                 p = np
                 positions[p] = 1
-    return len(positions)
+    return positions
 
 
 def stuck(map):
@@ -65,20 +65,19 @@ def stuck(map):
     return False
 
 
-def part2():
+def part2(positions):
     map = Grid.from_file("day6.txt", lambda v: v)
     total = 0
-    for y in range(map.height):
-        for x in range(map.width):
-            p = Position(x, y)
-            if map.get(p) == ".":
-                map.set(p, "#")
-                if stuck(map):
-                    total += 1
-                map.set(p, ".")
+    for p in positions:
+        if map.get(p) == ".":
+            map.set(p, "#")
+            if stuck(map):
+                total += 1
+            map.set(p, ".")
     return total
 
 
 if __name__ == "__main__":
-    print("Part1:", part1())
-    print("Part2:", part2())
+    positions = part1()
+    print("Part1:", len(positions))
+    print("Part2:", part2(positions))
