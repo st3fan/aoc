@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 
+# Optimized for speed
+
+
 # From https://stackoverflow.com/a/72914390/56837
 def profile(fnc):
     """
@@ -39,11 +42,11 @@ DIRECTION_VECTOR_CHANGES = {
 }
 
 
-def find(map, c):
-    for y in range(len(map)):
-        for x in range(len(map[0])):
+def find(map, width, height, c):
+    for y in range(height):
+        for x in range(width):
             if map[y][x] == c:
-                return (x, y)
+                return x, y
 
 
 def part1():
@@ -55,7 +58,7 @@ def part1():
 
     positions = {}
 
-    if p := find(map, 94):  # Conditional to keep mypy happy
+    if p := find(map, width, height, 94):  # Conditional to keep mypy happy
         while True:
             positions[p] = 1
             np = (p[0] + v[0], p[1] + v[1])
@@ -71,43 +74,44 @@ def part1():
     return positions
 
 
-def stuck(map, p, width, height):
+def stuck(map, px, py, width, height):
     v = (0, -1)  # Up
 
-    positions = {}  # (position, v)
+    positions = {}
 
     while True:
-        positions[p] = 1
-        np = (p[0] + v[0], p[1] + v[1])
-        if np[0] < 0 or np[1] < 0 or np[0] == width or np[1] == height:
-            break  # We fell off the map
-        if map[np[1]][np[0]] == 35:
+        # positions[p] = 1
+        nx = px + v[0]
+        ny = py + v[1]
+        if nx < 0 or ny < 0 or nx == width or ny == height:
+            return False
+        if map[ny][nx] == 35:
             # We hit a wall and turned
             v = DIRECTION_VECTOR_CHANGES[v]
         else:
-            key = (np, v)
+            key = (nx, ny, v)
             if key in positions:
                 return True
             # We actually moved
-            p = np
-            positions[key] = 1
-    return False
+            px = nx
+            py = ny
+            positions[key] = None
 
 
-# @profile
+@profile
 def part2(positions):
     map = load_input("day6.txt")
     width = len(map[0])
     height = len(map)
-    start = find(map, 94)
+    sx, sy = find(map, width, height, 94)
 
     total = 0
-    for p in positions:
-        if map[p[1]][p[0]] == 46:
-            map[p[1]][p[0]] = 35
-            if stuck(map, start, width, height):
+    for x, y in positions:
+        if map[y][x] == 46:
+            map[y][x] = 35
+            if stuck(map, sx, sy, width, height):
                 total += 1
-            map[p[1]][p[0]] = 46
+            map[y][x] = 46
     return total
 
 
