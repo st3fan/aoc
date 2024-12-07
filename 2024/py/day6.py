@@ -1,12 +1,33 @@
 #!/usr/bin/env python3
 
 
-from aoc import Grid, Position
+# From https://stackoverflow.com/a/72914390/56837
+def profile(fnc):
+    """
+    Profiles any function in following class just by adding @profile above function
+    """
+    import cProfile, pstats, io
+
+    def inner(*args, **kwargs):
+        pr = cProfile.Profile()
+        pr.enable()
+        retval = fnc(*args, **kwargs)
+        pr.disable()
+        s = io.StringIO()
+        sortby = "cumulative"  # Ordered
+        ps = pstats.Stats(pr, stream=s).strip_dirs().sort_stats(sortby)
+        n = 25
+        ps.print_stats(n)
+        # ps.dump_stats("profile.prof")
+        print(s.getvalue())
+        return retval
+
+    return inner
 
 
 def load_input(path):
     with open(path) as fp:
-        return [line.strip() for line in fp.readlines()]
+        return [list(line.strip()) for line in fp.readlines()]
 
 
 # Map from direction to new direction if a wall is hit
@@ -18,20 +39,29 @@ DIRECTION_VECTOR_CHANGES = {
 }
 
 
+def find(map, c):
+    for y in range(len(map)):
+        for x in range(len(map[0])):
+            if map[y][x] == c:
+                return (x, y)
+
+
 def part1():
-    map = Grid.from_file("day6.txt", lambda v: v)
+    map = load_input("day6.txt")
+    width = len(map[0])
+    height = len(map)
 
     v = (0, -1)  # Up
 
     positions = {}
 
-    if p := map.find("^"):  # Conditional to keep mypy happy
+    if p := find(map, "^"):  # Conditional to keep mypy happy
         while True:
             positions[p] = 1
-            np = Position(p.x + v[0], p.y + v[1])
-            if np.x < 0 or np.y < 0 or np.x == map.width or np.y == map.height:
+            np = (p[0] + v[0], p[1] + v[1])
+            if np[0] < 0 or np[1] < 0 or np[0] == width or np[1] == height:
                 break  # We fell off the map
-            if map.get(np) == "#":
+            if map[np[1]][np[0]] == "#":
                 # We hit a wall and turned
                 v = DIRECTION_VECTOR_CHANGES[v]
             else:
@@ -41,39 +71,43 @@ def part1():
     return positions
 
 
-def stuck(map):
+def stuck(map, p, width, height):
     v = (0, -1)  # Up
 
     positions = {}  # (position, v)
 
-    if p := map.find("^"):  # Conditional to keep mypy happy
-        while True:
-            positions[p] = 1
-            np = Position(p.x + v[0], p.y + v[1])
-            if np.x < 0 or np.y < 0 or np.x == map.width or np.y == map.height:
-                break  # We fell off the map
-            if map.get(np) == "#":
-                # We hit a wall and turned
-                v = DIRECTION_VECTOR_CHANGES[v]
-            else:
-                key = (np, v)
-                if key in positions:
-                    return True
-                # We actually moved
-                p = np
-                positions[key] = 1
+    while True:
+        positions[p] = 1
+        np = (p[0] + v[0], p[1] + v[1])
+        if np[0] < 0 or np[1] < 0 or np[0] == width or np[1] == height:
+            break  # We fell off the map
+        if map[np[1]][np[0]] == "#":
+            # We hit a wall and turned
+            v = DIRECTION_VECTOR_CHANGES[v]
+        else:
+            key = (np, v)
+            if key in positions:
+                return True
+            # We actually moved
+            p = np
+            positions[key] = 1
     return False
 
 
+@profile
 def part2(positions):
-    map = Grid.from_file("day6.txt", lambda v: v)
+    map = load_input("day6.txt")
+    width = len(map[0])
+    height = len(map)
+    start = find(map, "^")
+
     total = 0
     for p in positions:
-        if map.get(p) == ".":
-            map.set(p, "#")
-            if stuck(map):
+        if map[p[1]][p[0]] == ".":
+            map[p[1]][p[0]] = "#"
+            if stuck(map, start, width, height):
                 total += 1
-            map.set(p, ".")
+            map[p[1]][p[0]] = "."
     return total
 
 
