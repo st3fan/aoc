@@ -17,9 +17,9 @@ def solve(value, numbers, tokens):
         for o, v in zip(operators, numbers[1:]):
             match o, v:
                 case "+", v:
-                    a += v  # pyright: ignore
+                    a += v
                 case "*", v:
-                    a *= v  # pyright: ignore
+                    a *= v
                 case "||", v:
                     a = int(str(a) + str(v))
             if a > value:
