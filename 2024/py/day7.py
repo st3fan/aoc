@@ -30,9 +30,9 @@ def evaluate(tokens, value):
             return False
         match o, v:
             case "+", v:
-                a += v
+                a += v  # pyright: ignore
             case "*", v:
-                a *= v
+                a *= v  # pyright: ignore
             case "||", v:
                 a = int(str(a) + str(v))
     return a == value
