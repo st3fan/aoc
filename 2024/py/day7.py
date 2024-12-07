@@ -7,7 +7,7 @@ def read_input(path):
     with open(path) as fp:
         for line in fp.readlines():
             tn, en = line.strip().split(": ")
-            yield int(tn), [v for v in en.split(" ")]
+            yield int(tn), [int(v) for v in en.split(" ")]
 
 
 def left_to_right(tokens):
@@ -22,11 +22,26 @@ def left_to_right(tokens):
     return e
 
 
+def evaluate(tokens, value):
+    a: int = tokens[0]
+    it = iter(tokens[1:])
+    for o, v in zip_longest(it, it, fillvalue=None):
+        if a > value:
+            return False
+        match o, v:
+            case "+", v:
+                a += v
+            case "*", v:
+                a *= v
+            case "||", v:
+                a = int(str(a) + str(v))
+    return a == value
+
+
 def solve(value, numbers, tokens):
     for operators in product(tokens, repeat=len(numbers) - 1):
         tokens = [item for pair in zip_longest(numbers, operators) for item in pair if item is not None]
-        expression = left_to_right(tokens)
-        if eval(expression) == value:
+        if evaluate(tokens, value):
             return value
     return 0
 
