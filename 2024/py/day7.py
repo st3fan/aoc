@@ -35,12 +35,10 @@ def left_to_right(tokens):
 
 
 def solve2(value, numbers):
-    print("DEBUG Solving", value, numbers)
     for operators in product(["*", "+", "||"], repeat=len(numbers) - 1):
         tokens = [item for pair in zip_longest(numbers, operators) for item in pair if item is not None]
         tokens = left_to_right(tokens)
         if eval(tokens) == value:
-            print("  Match:", tokens)
             return value
     return 0
 
