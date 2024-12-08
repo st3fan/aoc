@@ -55,7 +55,7 @@ def part1(width: int, height: int, antennas: list[Antenna]) -> int:
 
 
 def part2(width: int, height: int, antennas: list[Antenna]) -> int:
-    antinodes: set[Point] = set([a.p for a in antennas])
+    antinodes = {a.p for a in antennas}
     for f in {a.f for a in antennas}:
         for a, b in permutations([a.p for a in antennas if a.f == f], r=2):
             v = a - b
