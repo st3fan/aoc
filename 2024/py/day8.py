@@ -16,7 +16,7 @@ class Point:
     x: int
     y: int
 
-    def __sub__(self, other: Self | Vector) -> Vector:
+    def __sub__(self, other: Self) -> Vector:
         return Vector(self.x - other.x, self.y - other.y)
 
     def __add__(self, v: Vector) -> "Point":
