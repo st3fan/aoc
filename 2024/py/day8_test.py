@@ -1,6 +1,10 @@
 from day8 import Point, Vector, read_input, part1, part2
 
 
+PART1_SOLUTION = 367
+PART2_SOLUTION = 1285
+
+
 def test_point():
     p = Point(1, 2)
     assert p.x == 1
@@ -38,18 +42,18 @@ def test_puzzle_logic():
 
 def bench_part1():
     width, height, antennas = read_input("day8.txt")
-    assert part1(width, height, antennas) == 367
+    assert part1(width, height, antennas) == PART1_SOLUTION
 
 
 def bench_part2():
     width, height, antennas = read_input("day8.txt")
-    assert part2(width, height, antennas) == 1285
+    assert part2(width, height, antennas) == PART2_SOLUTION
 
 
 def bench_both_parts():
     width, height, antennas = read_input("day8.txt")
-    assert part1(width, height, antennas) == 367
-    assert part2(width, height, antennas) == 1285
+    assert part1(width, height, antennas) == PART1_SOLUTION
+    assert part2(width, height, antennas) == PART2_SOLUTION
 
 
 def test_part1_performance(benchmark):
