@@ -1,4 +1,4 @@
-from day8 import Point, Vector
+from day8 import Point, Vector, read_input, part1, part2
 
 
 def test_point():
@@ -28,3 +28,31 @@ def test_foo():
     v2 = b - a
     p2 = b + v2
     assert p2 == Point(11, 17)
+
+
+def bench_part1():
+    width, height, antennas = read_input("day8.txt")
+    part1(width, height, antennas)
+
+
+def bench_part2():
+    width, height, antennas = read_input("day8.txt")
+    part2(width, height, antennas)
+
+
+def bench_both_parts():
+    width, height, antennas = read_input("day8.txt")
+    part1(width, height, antennas)
+    part2(width, height, antennas)
+
+
+def test_part1_performance(benchmark):
+    benchmark(bench_part1)
+
+
+def test_part2_performance(benchmark):
+    benchmark(bench_part2)
+
+
+def test_both_parts_performance(benchmark):
+    benchmark(bench_both_parts)
