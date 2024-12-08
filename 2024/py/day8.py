@@ -43,9 +43,8 @@ def read_input(path) -> tuple[int, int, list[Antenna]]:
 
 
 def part1(width: int, height: int, antennas: list[Antenna]) -> int:
-    unique_frequencies: set[str] = set(a.f for a in antennas)
     antinodes: set[Point] = set()
-    for f in unique_frequencies:
+    for f in set(a.f for a in antennas):
         for a, b in permutations([a.p for a in antennas if a.f == f], r=2):
             p = a + (a - b)
             if p.x >= 0 and p.x < width and p.y >= 0 and p.y < height:
@@ -54,9 +53,8 @@ def part1(width: int, height: int, antennas: list[Antenna]) -> int:
 
 
 def part2(width: int, height: int, antennas: list[Antenna]) -> int:
-    unique_frequencies: set[str] = set(a.f for a in antennas)
     antinodes: set[Point] = set([a.p for a in antennas])
-    for f in unique_frequencies:
+    for f in set(a.f for a in antennas):
         for a, b in permutations([a.p for a in antennas if a.f == f], r=2):
             v = a - b
             while (a := a + v) and a.x >= 0 and a.x < width and a.y >= 0 and a.y < height:
