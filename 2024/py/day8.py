@@ -20,8 +20,10 @@ class Point:
     def __sub__(self, other: Point) -> Vector:
         return Vector(self.x - other.x, self.y - other.y)
 
-    def __add__(self, v: Vector) -> Point:
-        return Point(self.x + v.x, self.y + v.y)
+    def __add__(self, v) -> Point:
+        if isinstance(v, Vector):
+            return Point(self.x + v.x, self.y + v.y)
+        raise TypeError(f"unsupported operand type(s) for +: '{self.__class__}' and '{v.__class__}'")
 
 
 @dataclass(frozen=True)
