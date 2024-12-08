@@ -46,20 +46,20 @@ def read_input(path) -> tuple[int, int, list[Antenna]]:
 
 def part1(width: int, height: int, antennas: list[Antenna]) -> int:
     antinodes: set[Point] = set()
-    for f in set(a.f for a in antennas):
+    for f in {a.f for a in antennas}:
         for a, b in permutations([a.p for a in antennas if a.f == f], r=2):
             p = a + (a - b)
-            if p.x >= 0 and p.x < width and p.y >= 0 and p.y < height:
+            if 0 <= p.x < width and 0 <= p.y < height:
                 antinodes.add(p)
     return len(antinodes)
 
 
 def part2(width: int, height: int, antennas: list[Antenna]) -> int:
     antinodes: set[Point] = set([a.p for a in antennas])
-    for f in set(a.f for a in antennas):
+    for f in {a.f for a in antennas}:
         for a, b in permutations([a.p for a in antennas if a.f == f], r=2):
             v = a - b
-            while (a := a + v) and a.x >= 0 and a.x < width and a.y >= 0 and a.y < height:
+            while (a := a + v) and 0 <= a.x < width and 0 <= a.y < height:
                 antinodes.add(a)
     return len(antinodes)
 
