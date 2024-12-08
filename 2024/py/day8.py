@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from itertools import permutations
-from typing import Generator, Self
 
 
 @dataclass(frozen=True)
@@ -16,10 +17,10 @@ class Point:
     x: int
     y: int
 
-    def __sub__(self, other: Self) -> Vector:
+    def __sub__(self, other: Point) -> Vector:
         return Vector(self.x - other.x, self.y - other.y)
 
-    def __add__(self, v: Vector) -> "Point":
+    def __add__(self, v: Vector) -> Point:
         return Point(self.x + v.x, self.y + v.y)
 
 
