@@ -57,8 +57,6 @@ def part2(width: int, height: int, antennas: list[Antenna]) -> int:
     antinodes: set[Point] = set([a.p for a in antennas])
     for f in unique_frequencies:
         for a, b in permutations([a.p for a in antennas if a.f == f], r=2):
-            # antinodes.add(a)
-            # antinodes.add(b)
             v = a - b
             while (a := a + v) and a.x >= 0 and a.x < width and a.y >= 0 and a.y < height:
                 antinodes.add(a)
