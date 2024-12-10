@@ -2,7 +2,7 @@
 
 
 from dataclasses import dataclass
-from itertools import cycle, groupby
+from itertools import chain, cycle, groupby
 
 
 def read_input(path):
@@ -88,22 +88,15 @@ def optimiz_disk_map(disk_map: list[int | None]) -> list[int | None]:
         # Find the first space where this chunk fits. May be its original space.
         if (dsti := find_space(chunks, srcc.length)) is not None:
             dstc = chunks[dsti]
-
-            # Easy case, same lengths, just replace
-            if srcc.length == dstc.length:
-                chunks[dsti] = srcc
-            else:
-                chunks[dsti : dsti + 1] = [srcc, Chunk(None, dstc.length - srcc.length, False)]
+            # Replace it and maybe add some space
+            chunks[dsti] = srcc
+            if srcc.length < dstc.length:
+                chunks.insert(dsti + 1, Chunk(None, dstc.length - srcc.length, False))
 
         # Mark this chunk as seen
         srcc.seen = True
 
-    # Flatten the chunks TODO One liner
-    flattened: list[int | None] = []
-    for c in chunks:
-        flattened += c.to_list()
-
-    return flattened
+    return list(chain.from_iterable(c.to_list() for c in chunks))
 
 
 def checksum_disk_map(disk_map: list[int | None]) -> int:
