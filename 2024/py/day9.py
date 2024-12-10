@@ -96,6 +96,7 @@ def optimiz_disk_map(disk_map: list[int | None]) -> list[int | None]:
         # Mark this chunk as seen
         srcc.seen = True
 
+    # Flatten the chunks into a list
     return list(chain.from_iterable(c.to_list() for c in chunks))
 
 
