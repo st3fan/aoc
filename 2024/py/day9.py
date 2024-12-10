@@ -74,10 +74,6 @@ def optimiz_disk_map(disk_map: list[int | None]) -> list[int | None]:
         chunks.append(Chunk(g[0], len(g), False))
 
     while True:
-        flattened: list[int | None] = []
-        for c in chunks:
-            flattened += c.to_list()
-
         # Find the next unseen file chunk
         if (srci := next_unseen(chunks)) == -1:
             break  # None left, we're done
@@ -89,7 +85,6 @@ def optimiz_disk_map(disk_map: list[int | None]) -> list[int | None]:
 
         # Find the first space where this chunk fits. May be its original space.
         if (dsti := find_space(chunks, srcc.length)) != -1:
-            #            print("FOUND SPACE AT", dsti)
             dstc = chunks[dsti]
 
             # Easy case, same lengths, just replace
@@ -106,23 +101,13 @@ def optimiz_disk_map(disk_map: list[int | None]) -> list[int | None]:
     for c in chunks:
         flattened += c.to_list()
 
-    # print("RESULT", "".join(["." if x is None else str(x) for x in flattened]))
-
     return flattened
 
 
 def checksum_disk_map(disk_map: list[int | None]) -> int:
-    c = 0
-    for i, v in enumerate(disk_map):
-        if v is not None:
-            c += i * v
-    return c
+    return sum(i * v for i, v in enumerate(disk_map) if v is not None)
 
 
 if __name__ == "__main__":
-    # print("Part1:", checksum_disk_map(compact_disk_map(build_disk_map("day9.txt"))))
+    print("Part1:", checksum_disk_map(compact_disk_map(build_disk_map("day9.txt"))))
     print("Part2:", checksum_disk_map(optimiz_disk_map(build_disk_map("day9.txt"))))
-
-    # # If we have seen all file chunks then we're done
-    # if all(chunk.seen for chunk in chunks if chunk.value is not None):
-    #     break
