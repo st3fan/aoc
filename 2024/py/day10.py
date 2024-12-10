@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from itertools import product
 
 import networkx as nx
 
@@ -16,15 +17,12 @@ def load_points(path: str) -> dict[tuple[int, int], int]:
 def build_graph(points: dict[tuple[int, int], int]) -> nx.Graph:
     w = max(p[0] for p in points.keys())
     h = max(p[1] for p in points.keys())
+
     g = nx.DiGraph()
-    for x1 in range(w + 1):
-        for y1 in range(h + 1):
-            for x2 in range(w + 1):
-                for y2 in range(h + 1):
-                    if (x1, y1) != (x2, y2):
-                        if (abs(x1 - x2) + abs(y1 - y2)) == 1:
-                            if points[(x2, y2)] == (points[(x1, y1)] + 1):
-                                g.add_edge((x1, y1), (x2, y2))
+    for x1, y1, x2, y2 in product(*[range(w + 1), range(h + 1), range(w + 1), range(h + 1)]):
+        if (x1, y1) != (x2, y2) and (abs(x1 - x2) + abs(y1 - y2)) == 1:
+            if points[(x2, y2)] == (points[(x1, y1)] + 1):
+                g.add_edge((x1, y1), (x2, y2))
     return g
 
 
@@ -45,8 +43,7 @@ def part2(path: str) -> int:
     total = 0
     for start in [k for k, v in points.items() if v == 0]:
         for end in [k for k, v in points.items() if v == 9]:
-            paths = list(nx.all_simple_paths(graph, start, end))
-            total += len(paths)
+            total += len(list(nx.all_simple_paths(graph, start, end)))
     return total
 
 
