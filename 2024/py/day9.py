@@ -51,20 +51,18 @@ class Chunk:
         return [self.value] * self.length
 
 
-def next_unseen(chunks: list[Chunk]) -> int:
+def next_unseen(chunks: list[Chunk], start: int) -> int | None:
     """From right to left find the next file chunk not seen yet"""
-    for i in range(len(chunks) - 1, -1, -1):
+    for i in range(start - 1, -1, -1):
         if chunks[i].value is not None and not chunks[i].seen:
             return i
-    return -1
 
 
-def find_space(chunks: list[Chunk], length: int) -> int:
+def find_space(chunks: list[Chunk], length: int) -> int | None:
     """Find the first space chunk that has room for a file of length"""
     for i, c in enumerate(chunks):
         if c.value is None and c.length >= length:
             return i
-    return -1
 
 
 def optimiz_disk_map(disk_map: list[int | None]) -> list[int | None]:
@@ -73,10 +71,14 @@ def optimiz_disk_map(disk_map: list[int | None]) -> list[int | None]:
         g = list(g)
         chunks.append(Chunk(g[0], len(g), False))
 
+    last_seen_index = len(chunks)
+
     while True:
         # Find the next unseen file chunk
-        if (srci := next_unseen(chunks)) == -1:
+        if (srci := next_unseen(chunks, last_seen_index)) is None:
             break  # None left, we're done
+
+        last_seen_index = srci + 1
 
         srcc = chunks[srci]
 
@@ -84,7 +86,7 @@ def optimiz_disk_map(disk_map: list[int | None]) -> list[int | None]:
         chunks[srci] = Chunk(None, srcc.length, False)
 
         # Find the first space where this chunk fits. May be its original space.
-        if (dsti := find_space(chunks, srcc.length)) != -1:
+        if (dsti := find_space(chunks, srcc.length)) is not None:
             dstc = chunks[dsti]
 
             # Easy case, same lengths, just replace
