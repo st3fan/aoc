@@ -5,9 +5,6 @@ from math import floor, log10
 
 INPUT = (92, 0, 286041, 8034, 34394, 795, 8, 2051489)
 
-ROUNDS1 = 25
-ROUNDS2 = 75
-
 
 @cache
 def apply_rules(n: int) -> list[int]:
@@ -24,17 +21,16 @@ def apply_rules(n: int) -> list[int]:
 
 
 @cache
-def blink(numbers: tuple[int], max_depth: int, current_depth: int) -> int:
-    if current_depth >= max_depth:
+def blink(numbers: tuple[int], rounds: int) -> int:
+    if rounds == 0:
         return len(numbers)
 
     total = 0
     for number in numbers:
-        total += blink(tuple(apply_rules(number)), max_depth, current_depth + 1)
-
+        total += blink(tuple(apply_rules(number)), rounds - 1)
     return total
 
 
 if __name__ == "__main__":
-    print("Part1", blink(INPUT, max_depth=ROUNDS1, current_depth=0))
-    print("Part2", blink(INPUT, max_depth=ROUNDS2, current_depth=0))
+    print("Part1", blink(INPUT, rounds=25))
+    print("Part2", blink(INPUT, rounds=75))
