@@ -3,8 +3,10 @@
 import math
 from itertools import batched
 
-INPUT = [92, 0, 286041, 8034, 34394, 795, 8, 2051489]  # [125, 17]
-ROUNDS = 35  # 6
+INPUT = [92, 0, 286041, 8034, 34394, 795, 8, 2051489]
+
+ROUNDS1 = 25
+ROUNDS2 = 75
 
 
 def transform_list(numbers: list[int]) -> list[int]:
@@ -33,7 +35,7 @@ def blink(numbers: list[int], max_depth: int, current_depth: int):
     # Lame this only exists because the functools.cache decorator can't handle lists and arguments to ignore.
     key = ",".join([str(v) for v in numbers]) + ":" + str(current_depth)
 
-    # The caching happens here because we want to avoid recursion
+    # The caching happens here because we want to avoid recursion and the transform_list function
     if r := CACHE.get(key):
         return r
 
@@ -48,4 +50,7 @@ def blink(numbers: list[int], max_depth: int, current_depth: int):
 
 
 if __name__ == "__main__":
-    print("Part1", blink(INPUT, max_depth=75, current_depth=0))
+    CACHE = {}
+    print("Part1", blink(INPUT, max_depth=ROUNDS1, current_depth=0))
+    CACHE = {}
+    print("Part2", blink(INPUT, max_depth=ROUNDS2, current_depth=0))
