@@ -10,14 +10,13 @@ INPUT = (92, 0, 286041, 8034, 34394, 795, 8, 2051489)
 def apply_rules(n: int) -> list[int]:
     if n == 0:
         return [1]
-    else:
-        digits = floor(log10(n)) + 1
-        if digits % 2 == 0:
-            div = 10 ** (digits // 2)
-            first, second = divmod(n, div)
-            return [first, second]
-        else:
-            return [n * 2024]
+
+    if (digits := floor(log10(n)) + 1) and digits % 2 == 0:
+        div = 10 ** (digits // 2)
+        first, second = divmod(n, div)
+        return [first, second]
+
+    return [n * 2024]
 
 
 @cache
