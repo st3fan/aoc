@@ -45,18 +45,12 @@ def perimeter(region: Region, map: Map) -> int:
 
 
 def sides(region: Region, map: Map) -> int:
-    # print("Region", region.plant_type)
-    # for p in region.points:
-    #     print("  ", p)
-    # return 0
-
     side_points = set()
     for p in region.points:
         for v in ((-1, 0), (1, 0), (0, -1), (0, 1)):
             sp = Point(p.x + v[0], p.y + v[1])
             if sp not in map or map[sp] != region.plant_type:
-                np = Point(p.x + (0.5 * v[0]), p.y + (0.5 * v[1]))
-                # print("V", v, "P", p, " => ", "NP", np)
+                np = Point(p.x + (0.25 * v[0]), p.y + (0.25 * v[1]))
                 side_points.add(np)
 
     w = int(max(p[0] for p in map.keys()) + 1)
@@ -66,20 +60,17 @@ def sides(region: Region, map: Map) -> int:
 
     # Scan vertically Group by x diff is 1.0
     for y in range(h + 1):
-        points = sorted([p for p in side_points if p.y == (y - 0.5)], key=attrgetter("x"))
-        #
-        t = len(list(split_when(points, lambda a, b: b.x - a.x > 1.0)))  # ?
-        print("Region", region.plant_type, "HOR", "T", t, "POINTS", len(points), points)
-        total += t
+        points = sorted([p for p in side_points if p.y == (y - 0.25)], key=attrgetter("x"))
+        total += len(list(split_when(points, lambda a, b: b.x - a.x > 1.0)))  # ?
+        points = sorted([p for p in side_points if p.y == (y - 0.75)], key=attrgetter("x"))
+        total += len(list(split_when(points, lambda a, b: b.x - a.x > 1.0)))  # ?
 
     # Scan horitontally Group by y diff is 1.0
     for x in range(w + 1):
-        points = sorted([p for p in side_points if p.x == (x - 0.5)], key=attrgetter("y"))
-        t = len(list(split_when(points, lambda a, b: b.y - a.y > 1.0)))
-        print("Region", region.plant_type, "VER", "T", t, "POINTS", len(points), points)
-        total += t
-
-    print(f"Region {region.plant_type} - Price = {area(region)} * {total} = {area(region) * total}")
+        points = sorted([p for p in side_points if p.x == (x - 0.25)], key=attrgetter("y"))
+        total += len(list(split_when(points, lambda a, b: b.y - a.y > 1.0)))
+        points = sorted([p for p in side_points if p.x == (x - 0.75)], key=attrgetter("y"))
+        total += len(list(split_when(points, lambda a, b: b.y - a.y > 1.0)))
 
     return total
 
@@ -120,5 +111,5 @@ def calculate(map: Map, price_fn) -> int:
 
 
 if __name__ == "__main__":
-    print("Part1", calculate(load_map("day12_test.txt"), price))
-    print("Part2", calculate(load_map("day12_test.txt"), discounted_price))
+    print("Part1", calculate(load_map("day12.txt"), price))
+    print("Part2", calculate(load_map("day12.txt"), discounted_price))
