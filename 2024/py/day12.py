@@ -58,14 +58,14 @@ def sides(region: Region, map: Map) -> int:
 
     total = 0
 
-    # Scan vertically Group by x diff is 1.0
+    # Scan vertically and split by fence gaps
     for y in range(h + 1):
         points = sorted([p for p in side_points if p.y == (y - 0.25)], key=attrgetter("x"))
-        total += len(list(split_when(points, lambda a, b: b.x - a.x > 1.0)))  # ?
+        total += len(list(split_when(points, lambda a, b: b.x - a.x > 1.0)))
         points = sorted([p for p in side_points if p.y == (y + 0.25)], key=attrgetter("x"))
-        total += len(list(split_when(points, lambda a, b: b.x - a.x > 1.0)))  # ?
+        total += len(list(split_when(points, lambda a, b: b.x - a.x > 1.0)))
 
-    # Scan horitontally Group by y diff is 1.0
+    # Scan horizontally and split by fence gaps
     for x in range(w + 1):
         points = sorted([p for p in side_points if p.x == (x - 0.25)], key=attrgetter("y"))
         total += len(list(split_when(points, lambda a, b: b.y - a.y > 1.0)))
