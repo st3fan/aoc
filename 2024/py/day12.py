@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 
+from operator import attrgetter
 from typing import NamedTuple
+
+from more_itertools import split_when
 
 type PlantType = str
 
 
 class Point(NamedTuple):
-    x: int
-    y: int
+    x: float
+    y: float
 
 
 type Map = dict[Point, PlantType]
@@ -41,8 +44,44 @@ def perimeter(region: Region, map: Map) -> int:
     return t
 
 
-def price(region: Region, map: Map) -> int:
-    return area(region) * perimeter(region, map)
+def sides(region: Region, map: Map) -> int:
+    # print("Region", region.plant_type)
+    # for p in region.points:
+    #     print("  ", p)
+    # return 0
+
+    side_points = set()
+    for p in region.points:
+        for v in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            sp = Point(p.x + v[0], p.y + v[1])
+            if sp not in map or map[sp] != region.plant_type:
+                np = Point(p.x + (0.5 * v[0]), p.y + (0.5 * v[1]))
+                # print("V", v, "P", p, " => ", "NP", np)
+                side_points.add(np)
+
+    w = int(max(p[0] for p in map.keys()) + 1)
+    h = int(max(p[1] for p in map.keys()) + 1)
+
+    total = 0
+
+    # Scan vertically Group by x diff is 1.0
+    for y in range(h + 1):
+        points = sorted([p for p in side_points if p.y == (y - 0.5)], key=attrgetter("x"))
+        #
+        t = len(list(split_when(points, lambda a, b: b.x - a.x > 1.0)))  # ?
+        print("Region", region.plant_type, "HOR", "T", t, "POINTS", len(points), points)
+        total += t
+
+    # Scan horitontally Group by y diff is 1.0
+    for x in range(w + 1):
+        points = sorted([p for p in side_points if p.x == (x - 0.5)], key=attrgetter("y"))
+        t = len(list(split_when(points, lambda a, b: b.y - a.y > 1.0)))
+        print("Region", region.plant_type, "VER", "T", t, "POINTS", len(points), points)
+        total += t
+
+    print(f"Region {region.plant_type} - Price = {area(region)} * {total} = {area(region) * total}")
+
+    return total
 
 
 def expand_region(map: Map, p: Point) -> Region:
@@ -61,16 +100,25 @@ def expand_region(map: Map, p: Point) -> Region:
     return Region(points=points, plant_type=plant_type)
 
 
-def part1(map: Map) -> int:
+def price(region: Region, map: Map) -> int:
+    return area(region) * perimeter(region, map)
+
+
+def discounted_price(region: Region, map: Map) -> int:
+    return area(region) * sides(region, map)
+
+
+def calculate(map: Map, price_fn) -> int:
     total_price = 0
     seen = set()
     for p in map.keys():
         if p not in seen:
             region = expand_region(map, p)
-            total_price += price(region, map)
+            total_price += price_fn(region, map)
             seen |= region.points
     return total_price
 
 
 if __name__ == "__main__":
-    print("Part1", part1(load_map("day12.txt")))
+    print("Part1", calculate(load_map("day12_test.txt"), price))
+    print("Part2", calculate(load_map("day12_test.txt"), discounted_price))
