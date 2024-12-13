@@ -62,14 +62,14 @@ def sides(region: Region, map: Map) -> int:
     for y in range(h + 1):
         points = sorted([p for p in side_points if p.y == (y - 0.25)], key=attrgetter("x"))
         total += len(list(split_when(points, lambda a, b: b.x - a.x > 1.0)))  # ?
-        points = sorted([p for p in side_points if p.y == (y - 0.75)], key=attrgetter("x"))
+        points = sorted([p for p in side_points if p.y == (y + 0.25)], key=attrgetter("x"))
         total += len(list(split_when(points, lambda a, b: b.x - a.x > 1.0)))  # ?
 
     # Scan horitontally Group by y diff is 1.0
     for x in range(w + 1):
         points = sorted([p for p in side_points if p.x == (x - 0.25)], key=attrgetter("y"))
         total += len(list(split_when(points, lambda a, b: b.y - a.y > 1.0)))
-        points = sorted([p for p in side_points if p.x == (x - 0.75)], key=attrgetter("y"))
+        points = sorted([p for p in side_points if p.x == (x + 0.25)], key=attrgetter("y"))
         total += len(list(split_when(points, lambda a, b: b.y - a.y > 1.0)))
 
     return total
