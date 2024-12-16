@@ -172,7 +172,6 @@ def part2(map: Grid[Object], movements: list[Movement]) -> int:
                                 push_boxes(map, boxes, -1)
                                 map.swap(rp, p)
                                 rp = p
-
                 case Movement.DOWN:
                     p = Position(rp.x, rp.y + 1)
                     match map.get(p):
@@ -185,7 +184,6 @@ def part2(map: Grid[Object], movements: list[Movement]) -> int:
                                 push_boxes(map, boxes, 1)
                                 map.swap(rp, p)
                                 rp = p
-
                 case Movement.LEFT:
                     if fp := has_left_space(map, rp):
                         rp = push_left(map, rp, fp)
