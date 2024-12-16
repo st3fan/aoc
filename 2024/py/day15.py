@@ -6,12 +6,16 @@ from pathlib import Path
 
 from aoc import Grid, Position
 
+# Data model
+
 
 class Object(StrEnum):
     WALL = "#"
-    OBJECT = "O"
+    BOX = "O"
     ROBOT = "@"
     SPACE = "."
+    BOX_LEFT = "["
+    BOX_RIGHT = "]"
 
 
 class Movement(IntEnum):
@@ -21,8 +25,26 @@ class Movement(IntEnum):
     RIGHT = ord(">")
 
 
-def read_map(path: str) -> Grid[Object]:
+# Reading input
+
+
+def read_map1(path: str) -> Grid[Object]:
     return Grid.from_file(str(Path(path)), lambda c: Object(c))
+
+
+CHANGES = {
+    "#": "##",
+    "O": "[]",
+    ".": "..",
+    "@": "@.",
+}
+
+
+def read_map2(path: str) -> Grid[Object]:
+    grid_data = Path(path).read_text().strip()
+    for o, n in CHANGES.items():
+        grid_data = grid_data.replace(o, n)
+    return Grid.from_str(grid_data, lambda c: Object(c))
 
 
 # PyRight fails on PathLike[str] although that is correct usage?
@@ -30,16 +52,31 @@ def read_movements(path: str) -> list[Movement]:
     return [Movement(ord(c)) for c in Path(path).read_text() if ord(c) in Movement]
 
 
-#
+# Scoring
 
 
-def score(map: Grid[Object]) -> int:
+def score1(map: Grid[Object]) -> int:
     total = 0
     for y in range(map.height):
         for x in range(map.width):
-            if map.get(Position(x, y)) == Object.OBJECT:
+            if map.get(Position(x, y)) == Object.BOX:
                 total += y * 100 + x
     return total
+
+
+# Not sure yet but I think we have to find the closest horizontal edge
+def score2(map: Grid[Object]) -> int:
+    total = 0
+    for y in range(map.height):
+        for x in range(map.width):
+            if map.get(Position(x, y)) == Object.BOX_LEFT:
+                total += y * 100 + x  # min([x, map.width - (x + 2)])
+    return total
+
+
+# ##...[]...##
+#
+# 5 = width - (p.x+2)
 
 
 # This is all very naively written
@@ -127,18 +164,167 @@ def part1(map: Grid[Object], movements: list[Movement]) -> int:
                 if fp := has_right_space(map, rp):
                     rp = push_right(map, rp, fp)
 
-    return score(map)
+    return score1(map)
 
 
-def part2(map: Grid[Object], movements: list[Movement]) -> int:
-    return 0
+# Completely new strategy for part 2 based on shapes
+
+
+def find_boxes_up(map: Grid[Object], p: Position) -> set[Position]:
+    """Find all boxes to move up above p"""
+
+    points: set[Position] = set()
+
+    def dfs(p: Position):
+        # Skip if already see or if it is a space or wall
+        if p in points or map.get(p) in (Object.SPACE, Object.WALL):
+            return
+
+        points.add(p)
+
+        match map.get(p):
+            case Object.BOX_LEFT:
+                dfs(Position(p.x + 1, p.y))
+                dfs(Position(p.x + 1, p.y - 1))
+            case Object.BOX_RIGHT:
+                dfs(Position(p.x - 1, p.y))
+                dfs(Position(p.x - 1, p.y - 1))
+
+    dfs(p)
+
+    return points
+
+
+def test_boxes_up(map: Grid[Object], boxes: set[Position]):
+    """Test if boxes can be pushed up on the map. Top down."""
+    for p in sorted(boxes, key=lambda p: p.y):
+        np = Position(p.x, p.y - 1)
+        if np not in boxes and map.get(np) != Object.SPACE:
+            return False
+    return True
+
+
+# TODO This may also need to be sorted by y
+def push_boxes_up(map: Grid[Object], boxes: set[Position]):
+    """Push all boxes up"""
+    for p in sorted(boxes, key=lambda p: p.y, reverse=False):
+        map.swap(p, Position(p.x, p.y - 1))
 
 
 #
 
-if __name__ == "__main__":
-    map = read_map("day15_map.txt")
-    movements = read_movements("day15_movements.txt")
 
-    print("Part1", part1(map, movements))
-    print("Part2", part2(map, movements))
+def find_boxes_down(map: Grid[Object], p: Position) -> set[Position]:
+    """Find all boxes to move down under p"""
+
+    points: set[Position] = set()
+
+    def dfs(p: Position):
+        # Skip if already see or if it is a space or wall
+        if p in points or map.get(p) in (Object.SPACE, Object.WALL):
+            return
+
+        points.add(p)
+
+        match map.get(p):
+            case Object.BOX_LEFT:
+                dfs(Position(p.x + 1, p.y))
+                dfs(Position(p.x + 1, p.y + 1))
+            case Object.BOX_RIGHT:
+                dfs(Position(p.x - 1, p.y))
+                dfs(Position(p.x - 1, p.y + 1))
+
+    dfs(p)
+
+    return points
+
+
+def test_boxes_down(map: Grid[Object], boxes: set[Position]):
+    """Test if boxes can be pushed down on the map. Bottom up."""
+    for p in sorted(boxes, key=lambda p: p.y, reverse=True):
+        np = Position(p.x, p.y + 1)
+        if np not in boxes and map.get(np) != Object.SPACE:
+            return False
+    return True
+
+
+# TODO This may also need to be sorted by y
+def push_boxes_down(map: Grid[Object], boxes: set[Position]):
+    """Push all boxes down"""
+    for p in sorted(boxes, key=lambda p: p.y, reverse=True):
+        map.swap(p, Position(p.x, p.y + 1))
+
+
+def part2(map: Grid[Object], movements: list[Movement]) -> int:
+    if (rp := map.find(Object.ROBOT)) is None:
+        raise Exception("Cannot find the robot on the map")
+
+    # # map.set(Position(8, 8), Object.SPACE)
+    # # map.set(Position(9, 8), Object.BOX_LEFT)
+    # # map.set(Position(10, 8), Object.BOX_RIGHT)
+
+    # print("BEFORE")
+    # map.dump()
+
+    # # boxes = find_boxes_up(map, Position(9, 8))
+    # # if test_boxes_up(map, boxes):
+    # #     push_boxes_up(map, boxes)
+
+    # boxes = find_boxes_down(map, Position(8, 1))
+
+    # for p in boxes:
+    #     print("  ", p)
+
+    # if test_boxes_down(map, boxes):
+    #     push_boxes_down(map, boxes)
+
+    # print("AFTER")
+    # map.dump()
+
+    # print("ORIGINAL")
+    # map.dump()
+
+    for step, move in enumerate(movements):
+        match move:
+            case Movement.UP:
+                p = Position(rp.x, rp.y - 1)
+                match map.get(p):
+                    case Object.SPACE:
+                        map.swap(rp, p)
+                        rp = p
+                    case Object.BOX_LEFT | Object.BOX_RIGHT:
+                        boxes = find_boxes_up(map, p)
+                        if test_boxes_up(map, boxes):
+                            push_boxes_up(map, boxes)
+                            map.swap(rp, p)
+                            rp = p
+
+            case Movement.DOWN:
+                p = Position(rp.x, rp.y + 1)
+                match map.get(p):
+                    case Object.SPACE:
+                        map.swap(rp, p)
+                        rp = p
+                    case Object.BOX_LEFT | Object.BOX_RIGHT:
+                        boxes = find_boxes_down(map, p)
+                        if test_boxes_down(map, boxes):
+                            push_boxes_down(map, boxes)
+                            map.swap(rp, p)
+                            rp = p
+
+            case Movement.LEFT:
+                if fp := has_left_space(map, rp):
+                    rp = push_left(map, rp, fp)
+            case Movement.RIGHT:
+                if fp := has_right_space(map, rp):
+                    rp = push_right(map, rp, fp)
+
+        # print("STEP", step, "MOVEMENT", move.name)
+        # map.dump()
+
+    return score2(map)
+
+
+if __name__ == "__main__":
+    print("Part1", part1(read_map1("day15_map_test.txt"), read_movements("day15_movements.txt")))
+    print("Part2", part2(read_map2("day15_map.txt"), read_movements("day15_movements.txt")))
