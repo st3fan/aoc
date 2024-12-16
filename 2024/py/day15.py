@@ -27,41 +27,15 @@ def read_map1(path: str) -> Grid[Object]:
     return Grid.from_file(str(Path(path)), lambda c: Object(c))
 
 
-CHANGES = {
-    "#": "##",
-    "O": "[]",
-    ".": "..",
-    "@": "@.",
-}
-
-
 def read_map2(path: str) -> Grid[Object]:
     grid_data = Path(path).read_text().strip()
-    for o, n in CHANGES.items():
+    for o, n in {"#": "##", "O": "[]", ".": "..", "@": "@."}.items():
         grid_data = grid_data.replace(o, n)
     return Grid.from_str(grid_data, lambda c: Object(c))
 
 
 def read_movements(path: str) -> list[Movement]:
     return [Movement(ord(c)) for c in Path(path).read_text() if ord(c) in Movement]
-
-
-def score1(map: Grid[Object]) -> int:
-    total = 0
-    for y in range(map.height):
-        for x in range(map.width):
-            if map.get(Position(x, y)) == Object.BOX:
-                total += y * 100 + x
-    return total
-
-
-def score2(map: Grid[Object]) -> int:
-    total = 0
-    for y in range(map.height):
-        for x in range(map.width):
-            if map.get(Position(x, y)) == Object.BOX_LEFT:
-                total += y * 100 + x  # min([x, map.width - (x + 2)])
-    return total
 
 
 def has_right_space(map: Grid[Object], rp: Position) -> Position | None:
@@ -143,7 +117,12 @@ def part1(map: Grid[Object], movements: list[Movement]) -> int:
                 if fp := has_right_space(map, rp):
                     rp = push_right(map, rp, fp)
 
-    return score1(map)
+    total = 0
+    for y in range(map.height):
+        for x in range(map.width):
+            if map.get(Position(x, y)) == Object.BOX:
+                total += y * 100 + x
+    return total
 
 
 def find_boxes_up(map: Grid[Object], p: Position) -> set[Position]:
@@ -175,7 +154,6 @@ def test_boxes_up(map: Grid[Object], boxes: set[Position]):
     return True
 
 
-# TODO This may also need to be sorted by y
 def push_boxes_up(map: Grid[Object], boxes: set[Position]):
     """Push all boxes up"""
     for p in sorted(boxes, key=lambda p: p.y, reverse=False):
@@ -214,7 +192,6 @@ def test_boxes_down(map: Grid[Object], boxes: set[Position]):
 
 
 def push_boxes_down(map: Grid[Object], boxes: set[Position]):
-    """Push all boxes down"""
     for p in sorted(boxes, key=lambda p: p.y, reverse=True):
         map.swap(p, Position(p.x, p.y + 1))
 
@@ -258,7 +235,12 @@ def part2(map: Grid[Object], movements: list[Movement]) -> int:
                 if fp := has_right_space(map, rp):
                     rp = push_right(map, rp, fp)
 
-    return score2(map)
+    total = 0
+    for y in range(map.height):
+        for x in range(map.width):
+            if map.get(Position(x, y)) == Object.BOX_LEFT:
+                total += y * 100 + x
+    return total
 
 
 if __name__ == "__main__":
