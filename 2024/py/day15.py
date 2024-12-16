@@ -99,23 +99,21 @@ def push_up(map: Grid[Object], rp: Position, fp: Position) -> Position:
 
 
 def part1(map: Grid[Object], movements: list[Movement]) -> int:
-    if (rp := map.find(Object.ROBOT)) is None:
-        raise Exception("Cannot find the robot on the map")
-
-    for move in movements:
-        match move:
-            case Movement.UP:
-                if fp := has_up_space(map, rp):
-                    rp = push_up(map, rp, fp)
-            case Movement.DOWN:
-                if fp := has_down_space(map, rp):
-                    rp = push_down(map, rp, fp)
-            case Movement.LEFT:
-                if fp := has_left_space(map, rp):
-                    rp = push_left(map, rp, fp)
-            case Movement.RIGHT:
-                if fp := has_right_space(map, rp):
-                    rp = push_right(map, rp, fp)
+    if rp := map.find(Object.ROBOT):
+        for move in movements:
+            match move:
+                case Movement.UP:
+                    if fp := has_up_space(map, rp):
+                        rp = push_up(map, rp, fp)
+                case Movement.DOWN:
+                    if fp := has_down_space(map, rp):
+                        rp = push_down(map, rp, fp)
+                case Movement.LEFT:
+                    if fp := has_left_space(map, rp):
+                        rp = push_left(map, rp, fp)
+                case Movement.RIGHT:
+                    if fp := has_right_space(map, rp):
+                        rp = push_right(map, rp, fp)
 
     total = 0
     for y in range(map.height):
@@ -125,7 +123,7 @@ def part1(map: Grid[Object], movements: list[Movement]) -> int:
     return total
 
 
-def find_boxes_up(map: Grid[Object], p: Position) -> set[Position]:
+def find_boxes(map: Grid[Object], p: Position, dy: int) -> set[Position]:
     points: set[Position] = set()
 
     def dfs(p: Position):
@@ -135,105 +133,65 @@ def find_boxes_up(map: Grid[Object], p: Position) -> set[Position]:
         match map.get(p):
             case Object.BOX_LEFT:
                 dfs(Position(p.x + 1, p.y))
-                dfs(Position(p.x + 1, p.y - 1))
+                dfs(Position(p.x + 1, p.y - dy))
             case Object.BOX_RIGHT:
                 dfs(Position(p.x - 1, p.y))
-                dfs(Position(p.x - 1, p.y - 1))
+                dfs(Position(p.x - 1, p.y - dy))
 
     dfs(p)
 
     return points
 
 
-def test_boxes_up(map: Grid[Object], boxes: set[Position]):
-    """Test if boxes can be pushed up on the map. Top down."""
-    for p in sorted(boxes, key=lambda p: p.y):
-        np = Position(p.x, p.y - 1)
+def test_boxes(map: Grid[Object], boxes: set[Position], dy: int):
+    for p in sorted(boxes, key=lambda p: p.y, reverse=(dy == 1)):
+        np = Position(p.x, p.y + dy)
         if np not in boxes and map.get(np) != Object.SPACE:
             return False
     return True
 
 
-def push_boxes_up(map: Grid[Object], boxes: set[Position]):
-    """Push all boxes up"""
-    for p in sorted(boxes, key=lambda p: p.y, reverse=False):
-        map.swap(p, Position(p.x, p.y - 1))
-
-
-def find_boxes_down(map: Grid[Object], p: Position) -> set[Position]:
-    """Find all boxes to move down under p"""
-    points: set[Position] = set()
-
-    def dfs(p: Position):
-        # Skip if already see or if it is a space or wall
-        if p in points or map.get(p) in (Object.SPACE, Object.WALL):
-            return
-        points.add(p)
-        match map.get(p):
-            case Object.BOX_LEFT:
-                dfs(Position(p.x + 1, p.y))
-                dfs(Position(p.x + 1, p.y + 1))
-            case Object.BOX_RIGHT:
-                dfs(Position(p.x - 1, p.y))
-                dfs(Position(p.x - 1, p.y + 1))
-
-    dfs(p)
-
-    return points
-
-
-def test_boxes_down(map: Grid[Object], boxes: set[Position]):
-    """Test if boxes can be pushed down on the map. Bottom up."""
-    for p in sorted(boxes, key=lambda p: p.y, reverse=True):
-        np = Position(p.x, p.y + 1)
-        if np not in boxes and map.get(np) != Object.SPACE:
-            return False
-    return True
-
-
-def push_boxes_down(map: Grid[Object], boxes: set[Position]):
-    for p in sorted(boxes, key=lambda p: p.y, reverse=True):
-        map.swap(p, Position(p.x, p.y + 1))
+def push_boxes(map: Grid[Object], boxes: set[Position], dy: int):
+    for p in sorted(boxes, key=lambda p: p.y, reverse=(dy == 1)):
+        map.swap(p, Position(p.x, p.y + dy))
 
 
 def part2(map: Grid[Object], movements: list[Movement]) -> int:
-    if (rp := map.find(Object.ROBOT)) is None:
-        raise Exception("Cannot find the robot on the map")
-
-    for move in movements:
-        match move:
-            case Movement.UP:
-                p = Position(rp.x, rp.y - 1)
-                match map.get(p):
-                    case Object.SPACE:
-                        map.swap(rp, p)
-                        rp = p
-                    case Object.BOX_LEFT | Object.BOX_RIGHT:
-                        boxes = find_boxes_up(map, p)
-                        if test_boxes_up(map, boxes):
-                            push_boxes_up(map, boxes)
+    if rp := map.find(Object.ROBOT):
+        for move in movements:
+            match move:
+                case Movement.UP:
+                    p = Position(rp.x, rp.y - 1)
+                    match map.get(p):
+                        case Object.SPACE:
                             map.swap(rp, p)
                             rp = p
+                        case Object.BOX_LEFT | Object.BOX_RIGHT:
+                            boxes = find_boxes(map, p, 1)
+                            if test_boxes(map, boxes, -1):
+                                push_boxes(map, boxes, -1)
+                                map.swap(rp, p)
+                                rp = p
 
-            case Movement.DOWN:
-                p = Position(rp.x, rp.y + 1)
-                match map.get(p):
-                    case Object.SPACE:
-                        map.swap(rp, p)
-                        rp = p
-                    case Object.BOX_LEFT | Object.BOX_RIGHT:
-                        boxes = find_boxes_down(map, p)
-                        if test_boxes_down(map, boxes):
-                            push_boxes_down(map, boxes)
+                case Movement.DOWN:
+                    p = Position(rp.x, rp.y + 1)
+                    match map.get(p):
+                        case Object.SPACE:
                             map.swap(rp, p)
                             rp = p
+                        case Object.BOX_LEFT | Object.BOX_RIGHT:
+                            boxes = find_boxes(map, p, -1)
+                            if test_boxes(map, boxes, 1):
+                                push_boxes(map, boxes, 1)
+                                map.swap(rp, p)
+                                rp = p
 
-            case Movement.LEFT:
-                if fp := has_left_space(map, rp):
-                    rp = push_left(map, rp, fp)
-            case Movement.RIGHT:
-                if fp := has_right_space(map, rp):
-                    rp = push_right(map, rp, fp)
+                case Movement.LEFT:
+                    if fp := has_left_space(map, rp):
+                        rp = push_left(map, rp, fp)
+                case Movement.RIGHT:
+                    if fp := has_right_space(map, rp):
+                        rp = push_right(map, rp, fp)
 
     total = 0
     for y in range(map.height):
