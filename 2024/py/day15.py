@@ -6,8 +6,6 @@ from pathlib import Path
 
 from aoc import Grid, Position
 
-# Data model
-
 
 class Object(StrEnum):
     WALL = "#"
@@ -23,9 +21,6 @@ class Movement(IntEnum):
     DOWN = ord("v")
     LEFT = ord("<")
     RIGHT = ord(">")
-
-
-# Reading input
 
 
 def read_map1(path: str) -> Grid[Object]:
@@ -47,12 +42,8 @@ def read_map2(path: str) -> Grid[Object]:
     return Grid.from_str(grid_data, lambda c: Object(c))
 
 
-# PyRight fails on PathLike[str] although that is correct usage?
 def read_movements(path: str) -> list[Movement]:
     return [Movement(ord(c)) for c in Path(path).read_text() if ord(c) in Movement]
-
-
-# Scoring
 
 
 def score1(map: Grid[Object]) -> int:
@@ -64,7 +55,6 @@ def score1(map: Grid[Object]) -> int:
     return total
 
 
-# Not sure yet but I think we have to find the closest horizontal edge
 def score2(map: Grid[Object]) -> int:
     total = 0
     for y in range(map.height):
@@ -72,14 +62,6 @@ def score2(map: Grid[Object]) -> int:
             if map.get(Position(x, y)) == Object.BOX_LEFT:
                 total += y * 100 + x  # min([x, map.width - (x + 2)])
     return total
-
-
-# ##...[]...##
-#
-# 5 = width - (p.x+2)
-
-
-# This is all very naively written
 
 
 def has_right_space(map: Grid[Object], rp: Position) -> Position | None:
@@ -142,9 +124,6 @@ def push_up(map: Grid[Object], rp: Position, fp: Position) -> Position:
     return Position(rp.x, rp.y - 1)
 
 
-#
-
-
 def part1(map: Grid[Object], movements: list[Movement]) -> int:
     if (rp := map.find(Object.ROBOT)) is None:
         raise Exception("Cannot find the robot on the map")
@@ -167,21 +146,13 @@ def part1(map: Grid[Object], movements: list[Movement]) -> int:
     return score1(map)
 
 
-# Completely new strategy for part 2 based on shapes
-
-
 def find_boxes_up(map: Grid[Object], p: Position) -> set[Position]:
-    """Find all boxes to move up above p"""
-
     points: set[Position] = set()
 
     def dfs(p: Position):
-        # Skip if already see or if it is a space or wall
         if p in points or map.get(p) in (Object.SPACE, Object.WALL):
             return
-
         points.add(p)
-
         match map.get(p):
             case Object.BOX_LEFT:
                 dfs(Position(p.x + 1, p.y))
@@ -211,21 +182,15 @@ def push_boxes_up(map: Grid[Object], boxes: set[Position]):
         map.swap(p, Position(p.x, p.y - 1))
 
 
-#
-
-
 def find_boxes_down(map: Grid[Object], p: Position) -> set[Position]:
     """Find all boxes to move down under p"""
-
     points: set[Position] = set()
 
     def dfs(p: Position):
         # Skip if already see or if it is a space or wall
         if p in points or map.get(p) in (Object.SPACE, Object.WALL):
             return
-
         points.add(p)
-
         match map.get(p):
             case Object.BOX_LEFT:
                 dfs(Position(p.x + 1, p.y))
@@ -248,7 +213,6 @@ def test_boxes_down(map: Grid[Object], boxes: set[Position]):
     return True
 
 
-# TODO This may also need to be sorted by y
 def push_boxes_down(map: Grid[Object], boxes: set[Position]):
     """Push all boxes down"""
     for p in sorted(boxes, key=lambda p: p.y, reverse=True):
@@ -259,32 +223,7 @@ def part2(map: Grid[Object], movements: list[Movement]) -> int:
     if (rp := map.find(Object.ROBOT)) is None:
         raise Exception("Cannot find the robot on the map")
 
-    # # map.set(Position(8, 8), Object.SPACE)
-    # # map.set(Position(9, 8), Object.BOX_LEFT)
-    # # map.set(Position(10, 8), Object.BOX_RIGHT)
-
-    # print("BEFORE")
-    # map.dump()
-
-    # # boxes = find_boxes_up(map, Position(9, 8))
-    # # if test_boxes_up(map, boxes):
-    # #     push_boxes_up(map, boxes)
-
-    # boxes = find_boxes_down(map, Position(8, 1))
-
-    # for p in boxes:
-    #     print("  ", p)
-
-    # if test_boxes_down(map, boxes):
-    #     push_boxes_down(map, boxes)
-
-    # print("AFTER")
-    # map.dump()
-
-    # print("ORIGINAL")
-    # map.dump()
-
-    for step, move in enumerate(movements):
+    for move in movements:
         match move:
             case Movement.UP:
                 p = Position(rp.x, rp.y - 1)
@@ -318,9 +257,6 @@ def part2(map: Grid[Object], movements: list[Movement]) -> int:
             case Movement.RIGHT:
                 if fp := has_right_space(map, rp):
                     rp = push_right(map, rp, fp)
-
-        # print("STEP", step, "MOVEMENT", move.name)
-        # map.dump()
 
     return score2(map)
 
