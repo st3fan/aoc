@@ -39,7 +39,9 @@ def parse_input(path: Path) -> list[Machine]:
     return [Machine.from_str(s) for s in path.read_text().strip().split("\n\n")]
 
 
-MAX_MOVES = 1_000_000
+# This was more fun
+
+MAX_MOVES = 100
 
 
 def brute(m: Machine, add=0):
@@ -59,7 +61,18 @@ def min_or_zero(it) -> int:
         return 0
 
 
+# With some hints from Reddit
+
+
+def calculate(m: Machine, add: int = 0) -> int:
+    a = ((m.p.x + add) * m.b.y - (m.p.y + add) * m.b.x) / (m.a.x * m.b.y - m.a.y * m.b.x)
+    b = (m.a.x * (m.p.y + add) - m.a.y * (m.p.x + add)) / (m.a.x * m.b.y - m.a.y * m.b.x)
+    if a.is_integer() and b.is_integer():
+        return int(a * 3 + b)
+    return 0
+
+
 if __name__ == "__main__":
-    machines = parse_input(Path("day13_test.txt"))
-    # print("Part1", sum(min_or_zero(brute(m)) for m in machines))
-    print("Part2", sum(min_or_zero(brute(m, add=10000000000000)) for m in machines))
+    machines = parse_input(Path("day13.txt"))
+    print("Part1", sum(calculate(m) for m in machines))
+    print("Part2", sum(calculate(m, add=10000000000000) for m in machines))
