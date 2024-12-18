@@ -79,7 +79,7 @@ class CPU:
                     self.c = int(trunc(self.a // (2 ** self._combo_operand(operand))))
                     self.pc += 1
                 case _:
-                    print("UNKNOWN INSTRUCTION", self.code[self.pc])
+                    print("UNKNOWN INSTRUCTION", self.code[self.pc])  #
 
             if self.debug:
                 print("  =>", f"a={self.a} b={self.b} c={self.c} output={self.output}")
@@ -87,39 +87,42 @@ class CPU:
         return False
 
 
-# 0o3, [0o2, 0o1, 0o0] => 0o3210
-def _build_a(i: int, inputs: list[int]) -> int:
-    t = i
+# [0o0, 0o1, 0o2], 0o3 => 0o0123...padding (length(n))
+def _build_a(inputs: list[int], i, length: int) -> int:
+    a = 0
     for v in inputs:
-        if v > 7:
-            raise Exception(f"Invalid v: {v}")
-        t <<= 3
-        t |= v
-    return t
+        a <<= 3
+        a |= v
+    a <<= 3
+    a |= i
+    # Pad right
+    for _ in range(length - len(inputs) - 1):
+        a <<= 3
+        a |= 1  # The padding doesn't seem to make a difference
+    # print("BUILD_A", inputs, i, length, "=>", oct(a))
+    return a
 
 
 def part2() -> int:
-    # We compare the code from left to right
+    # We compare the code from right to left
     CODE = [2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0]
 
     # The inputs are in "A order" - so rightmost bits are CODE[0]
     def crack(inputs: list[int]):
-        print("CRACK:", inputs)
+        print("\n\nCRACK:", inputs)
 
-        # We found a solution
-        if len(inputs) == len(CODE):
-            # print("FOUND CODE", inputs)  # Should push into queue or simply turn into A and MIN with other results for final answer
-            return
+        # # We found a solution This should be below?
+        # if len(inputs) == len(CODE):
+        #     print("FOUND CODE", inputs)  # Should push into queue or simply turn into A and MIN with other results for final answer
+        #     return
 
-        # We are going to loop over all 3 bit possibilities.
-
-        for i in range(1, 8):
+        for i in range(8):  # range(8): reverse?
             # Run the code
-            a = _build_a(i, inputs)
+            a = _build_a(inputs, i, len(CODE))
             cpu = CPU(code=[2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0], a=a)
             cpu.run()
 
-            print("I", i, "A", oct(a), "OUTPUT", cpu.output)
+            print("INPUTS", inputs, "I", i, "A", oct(a), "OUTPUT", cpu.output, "LEN(INPUTS)+1", len(inputs) + 1)
 
             # # The output length should be equal to the current length of the inputs plus one extra. This fails with leading zeros.
             # if len(cpu.output) != len(inputs) + 1:
@@ -129,17 +132,38 @@ def part2() -> int:
 
             # print("OUTPUT:", cpu.output, "CODE:", CODE)
 
-            # If the CPU output (which length should match input) is the same as the code then recursively try the next digit
+            # If the CPU output is the same as the code for N from the right then we are on the right track
 
-            if cpu.output == CODE[: len(cpu.output)]:
-                # print(f"We found a match at {i}, going into this one")
-                inputs = [i] + inputs  # Inputs grow to the left. New list, no copy needed?
-                crack(inputs)
+            n = len(inputs) + 1  # This is how many outputs to compare from the right side (plus one because we have not added the one just found)
+
+            # print("COMPARING", n, "OUT", cpu.output, "CODE", CODE)
+
+            if cpu.output[-n:] == CODE[-n:]:
+                # inputs =   # Inputs grow to the right. Not sure if we need the copy.
+                crack(inputs.copy() + [i])
+
+            # NOPE
+            # n = len(inputs) + 1  # This is how much to compare from the right
+            # if cpu.output[-n] == CODE[-n]:
+            #     inputs = inputs.copy() + [i]  # Inputs grow to the right. Not sure if we need the copy.
+            #     crack(inputs)
 
     crack([])
 
     return 0
 
+
+# #
+# # DO {
+# #     B = A % 8           # 0: BST A
+# #     B = B ^ 3           # 1: BXL 3
+# #     C = A / (2 ** B)    # 2: CDV B
+# #     A = A / (2 ** 3)    # 3: ADV 3
+# #     B = B ^ C           # 4: BXC
+# #     B = B ^ 5           # 5: BXL 5
+# #     OUT B               # 6: OUT 5
+# # } WHILE A != 0          # 7: JNZ 0
+# #
 
 if __name__ == "__main__":
     # cpu = CPU(code=[0, 1, 5, 4, 3, 0], a=729, b=0, c=0)
@@ -161,54 +185,24 @@ if __name__ == "__main__":
 
     # # Part 2
 
-    # #
-    # # 2 4 BST
-    # # 1 3 BXL
-    # # 7 5 CDV
-    # # 0 3 ADV
-    # # 4 1 BXC
-    # # 1 5 BXL
-    # # 5 5 OUT
-    # # 3 0 JNZ
-    # #
-    # # CODE:
-    # #
-    # # A = 45483412
-    # #
-    # # DO {
-    # #     B = A % 8           # 0: BST A
-    # #     B = B ^ 3           # 1: BXL 3
-    # #     C = A / (2 ** B)    # 2: CDV B
-    # #     A = A / (2 ** 3)    # 3: ADV 3
-    # #     B = B ^ C           # 4: BXC
-    # #     B = B ^ 5           # 5: BXL 5
-    # #     OUT B               # 6: OUT 5
-    # # } WHILE A != 0          # 7: JNZ 0
-    # #
+    print(oct(45483412))
 
-    # #
-    # # To get 16 results we need A to start at 8*16 = 281474976710656
-    # #
+    cpu = CPU(code=[2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0], a=0o200000000)
+    cpu.run()
+    print("A", cpu.output)
 
-    # CODE = [2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0]
+    cpu = CPU(code=[2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0], a=0o250000000)
+    cpu.run()
+    print("B", cpu.output)
 
-    # def truncate(l):
-    #     if len(l) > 16:
-    #         return l[:16] + ["..."]
-    #     return l
+    cpu = CPU(code=[2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0], a=0o255000000)
+    cpu.run()
+    print("C", cpu.output)
 
-    # # a = 35184372088832
-    # # for a in range(35184372088832, 35184372088832 + 1_000_000):
-    # #     cpu = CPU(code=CODE, a=a)
-    # #     cpu.run()
-    # #     print(a, "=>", cpu.output)
+    cpu = CPU(code=[2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0], a=0o255400000)
+    cpu.run()
+    print("D", cpu.output)
 
-    # for n in range(35184372088832, 35184372088832 * 2):
-    #     a = n
-    #     cpu = CPU(code=CODE, a=a)
-    #     cpu.run()
-    #     print(a, "=>", cpu.output, cpu.a, cpu.b, cpu.c)
-
-    # # Without recursion
-
-    # part2()
+    cpu = CPU(code=[2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0], a=211106232532992)
+    cpu.run()
+    print("JA?", cpu.output)
