@@ -61,7 +61,7 @@ class CPU:
             case _:
                 raise Exception(f"Invalid operand value: {operand}")
 
-    def run(self):
+    def run(self) -> list[int]:
         while self.pc < len(self.code):
             if self.debug:
                 print("EXECUTING", self.pc, "=>", self.code[self.pc])
@@ -100,7 +100,7 @@ class CPU:
             if self.debug:
                 print("  =>", f"a={self.a} b={self.b} c={self.c} output={self.output}")
 
-        return False
+        return self.output
 
 
 # [0o0, 0o1, 0o2], 0o3 => 0o0123...padding (length(n))
@@ -111,36 +111,31 @@ def _build_a(inputs: list[int], i, length: int) -> int:
         a |= v
     a <<= 3
     a |= i
-    # Padding
-    for _ in range(length - len(inputs) - 1):
-        a <<= 3
+    a <<= (length - len(inputs) - 1) * 3  # Padding to push values to the right
     return a
 
 
 def part2(code: list[int]) -> int:
     solutions = []
 
-    def crack(inputs: list[int]):
+    def crack(inputs: list[int] = []):
         for i in range(8):
             a = _build_a(inputs, i, len(code))
-            cpu = CPU(code=code, a=a)
-            cpu.run()
+            output = CPU(code=code, a=a).run()
             n = len(inputs) + 1
-            if cpu.output[-n:] == code[-n:]:
+            if output[-n:] == code[-n:]:
                 if n == len(code):
                     solutions.append(a)
                 else:
                     crack(inputs.copy() + [i])
 
-    crack([])
+    crack()
 
     return min(solutions)
 
 
 def part1(code: list[int], a: int = 0) -> str:
-    cpu = CPU(code=code, a=a)
-    cpu.run()
-    return ",".join(str(v) for v in cpu.output)
+    return ",".join(str(v) for v in CPU(code=code, a=a).run())
 
 
 if __name__ == "__main__":
