@@ -31,6 +31,7 @@ def part1(positions: list[Position], width: int, height: int, n: int) -> int:
         return 0
 
 
+# Completes in less than a minute. Can probably run in seconds if integrated in part1.
 def part2(positions: list[Position], width: int, height: int) -> str | None:
     for n in range(len(positions)):
         if part1(positions, width, height, n) == 0:
