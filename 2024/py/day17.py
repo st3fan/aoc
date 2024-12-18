@@ -3,6 +3,23 @@
 from enum import IntEnum
 from math import trunc
 
+# Too lazy to parse the input for this one
+CODE = [2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0]
+A = 45483412
+
+
+#
+# DO {
+#     B = A % 8           # 0: BST A
+#     B = B ^ 3           # 1: BXL 3
+#     C = A / (2 ** B)    # 2: CDV B
+#     A = A / (2 ** 3)    # 3: ADV 3
+#     B = B ^ C           # 4: BXC
+#     B = B ^ 5           # 5: BXL 5
+#     OUT B               # 6: OUT 5
+# } WHILE A != 0          # 7: JNZ 0
+#
+
 
 class Opcode(IntEnum):
     ADV = 0
@@ -16,12 +33,13 @@ class Opcode(IntEnum):
 
 
 class CPU:
-    # code: list[tuple[int, int]]
-    # a: int
-    # b: int
-    # c: int
-    # pc: int = 0
-    # output: list[int] = []
+    code: list[tuple[int, int]]
+    a: int
+    b: int
+    c: int
+    debug: bool
+    pc: int = 0
+    output: list[int] = []
 
     def __init__(self, *, code: list[int], a: int = 0, b: int = 0, c: int = 0, debug: bool = False):
         self.code = [(code[i * 2], code[i * 2 + 1]) for i in range(len(code) // 2)]
@@ -29,8 +47,6 @@ class CPU:
         self.b = b
         self.c = c
         self.debug = debug
-        self.pc = 0
-        self.output = []
 
     def _combo_operand(self, operand) -> int:
         match operand:
@@ -95,114 +111,38 @@ def _build_a(inputs: list[int], i, length: int) -> int:
         a |= v
     a <<= 3
     a |= i
-    # Pad right
+    # Padding
     for _ in range(length - len(inputs) - 1):
         a <<= 3
-        a |= 1  # The padding doesn't seem to make a difference
-    # print("BUILD_A", inputs, i, length, "=>", oct(a))
     return a
 
 
-def part2() -> int:
-    # We compare the code from right to left
-    CODE = [2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0]
+def part2(code: list[int]) -> int:
+    solutions = []
 
-    # The inputs are in "A order" - so rightmost bits are CODE[0]
     def crack(inputs: list[int]):
-        print("\n\nCRACK:", inputs)
-
-        # # We found a solution This should be below?
-        # if len(inputs) == len(CODE):
-        #     print("FOUND CODE", inputs)  # Should push into queue or simply turn into A and MIN with other results for final answer
-        #     return
-
-        for i in range(8):  # range(8): reverse?
-            # Run the code
-            a = _build_a(inputs, i, len(CODE))
-            cpu = CPU(code=[2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0], a=a)
+        for i in range(8):
+            a = _build_a(inputs, i, len(code))
+            cpu = CPU(code=code, a=a)
             cpu.run()
-
-            print("INPUTS", inputs, "I", i, "A", oct(a), "OUTPUT", cpu.output, "LEN(INPUTS)+1", len(inputs) + 1)
-
-            # # The output length should be equal to the current length of the inputs plus one extra. This fails with leading zeros.
-            # if len(cpu.output) != len(inputs) + 1:
-            #     print("CPU.OUTPUT", cpu.output)
-            #     print("INPUTS", inputs)
-            #     raise Exception(f"len(cpu.output) != len(inputs)+1: {len(cpu.output)} != {len(inputs)+1}")
-
-            # print("OUTPUT:", cpu.output, "CODE:", CODE)
-
-            # If the CPU output is the same as the code for N from the right then we are on the right track
-
-            n = len(inputs) + 1  # This is how many outputs to compare from the right side (plus one because we have not added the one just found)
-
-            # print("COMPARING", n, "OUT", cpu.output, "CODE", CODE)
-
-            if cpu.output[-n:] == CODE[-n:]:
-                # inputs =   # Inputs grow to the right. Not sure if we need the copy.
-                crack(inputs.copy() + [i])
-
-            # NOPE
-            # n = len(inputs) + 1  # This is how much to compare from the right
-            # if cpu.output[-n] == CODE[-n]:
-            #     inputs = inputs.copy() + [i]  # Inputs grow to the right. Not sure if we need the copy.
-            #     crack(inputs)
+            n = len(inputs) + 1
+            if cpu.output[-n:] == code[-n:]:
+                if n == len(code):
+                    solutions.append(a)
+                else:
+                    crack(inputs.copy() + [i])
 
     crack([])
 
-    return 0
+    return min(solutions)
 
 
-# #
-# # DO {
-# #     B = A % 8           # 0: BST A
-# #     B = B ^ 3           # 1: BXL 3
-# #     C = A / (2 ** B)    # 2: CDV B
-# #     A = A / (2 ** 3)    # 3: ADV 3
-# #     B = B ^ C           # 4: BXC
-# #     B = B ^ 5           # 5: BXL 5
-# #     OUT B               # 6: OUT 5
-# # } WHILE A != 0          # 7: JNZ 0
-# #
+def part1(code: list[int], a: int = 0) -> str:
+    cpu = CPU(code=code, a=a)
+    cpu.run()
+    return ",".join(str(v) for v in cpu.output)
+
 
 if __name__ == "__main__":
-    # cpu = CPU(code=[0, 1, 5, 4, 3, 0], a=729, b=0, c=0)
-    # cpu = CPU(code=[2, 6], c=9)
-    # cpu = CPU(code=[5, 0, 5, 1, 5, 4], a=10)
-    # cpu = CPU(code=[0, 1, 5, 4, 3, 0], a=2024)
-    # cpu = CPU(code=[4, 0], b=2024, c=43690)
-    # cpu.run()
-
-    # cpu = CPU(code=[0, 1, 5, 4, 3, 0], a=729)
-    # cpu.run()
-    # print("Part1:", "".join(str(v) for v in cpu.output))
-
-    # Part 1
-    cpu = CPU(code=[2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0], a=45483412)
-    cpu.run()
-    print("Part1:", ",".join(str(v) for v in cpu.output))
-    print("Part2:", part2())
-
-    # # Part 2
-
-    print(oct(45483412))
-
-    cpu = CPU(code=[2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0], a=0o200000000)
-    cpu.run()
-    print("A", cpu.output)
-
-    cpu = CPU(code=[2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0], a=0o250000000)
-    cpu.run()
-    print("B", cpu.output)
-
-    cpu = CPU(code=[2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0], a=0o255000000)
-    cpu.run()
-    print("C", cpu.output)
-
-    cpu = CPU(code=[2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0], a=0o255400000)
-    cpu.run()
-    print("D", cpu.output)
-
-    cpu = CPU(code=[2, 4, 1, 3, 7, 5, 0, 3, 4, 1, 1, 5, 5, 5, 3, 0], a=211106232532992)
-    cpu.run()
-    print("JA?", cpu.output)
+    print("Part1:", part1(CODE, A))
+    print("Part2:", part2(CODE))
