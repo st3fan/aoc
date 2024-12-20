@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum, IntEnum
-from functools import cache
 from itertools import islice, product
-from typing import Any, Callable, Generic, List, Optional, Self, TypeVar
+from typing import Callable, Generic, List, Optional, Self, TypeVar
 
 
 def nth(iterable, n, default=None):
@@ -76,6 +75,17 @@ class Grid(Generic[T]):
     width: int
     height: int
     nodes: List[T]
+
+    @classmethod
+    def from_str(cls, s: str, fn: Callable[[str], T]) -> Self:
+        nodes: List[T] = []
+        width = 0
+        height = 0
+        for line in (line.strip() for line in s.split("\n")):
+            width = len(line)
+            height += 1
+            nodes += [fn(e) for e in line]
+        return cls(width, height, nodes)
 
     @classmethod
     def from_file(cls, path: str, fn: Callable[[str], T]) -> Self:
@@ -159,9 +169,14 @@ class Grid(Generic[T]):
         c = c[-n % len(c) :] + c[: -n % len(c)]
         self.set_column(column, c)
 
+    def swap(self, pa: Position, pb: Position):
+        t = self.get(pa)
+        self.set(pa, self.get(pb))
+        self.set(pb, t)
+
     def dump(self):
         for row in range(self.height):
-            print("|" + "".join(self.get_row(row)) + "|")
+            print("".join([str(v) for v in self.get_row(row)]))
 
 
 class InfiniteGrid:
@@ -195,7 +210,6 @@ class InfiniteGrid:
 
 
 class Turtle:
-
     UP = 0
     RIGHT = 1
     DOWN = 2
