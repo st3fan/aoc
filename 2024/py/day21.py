@@ -40,7 +40,7 @@ def num_movements(g: nx.DiGraph, src: str, dst: str) -> list[str]:
     moves = []
     for a, b in pairwise(nx.shortest_path(g, source=src, target=dst)):
         moves.append(g.get_edge_data(a, b)["move"])
-    return moves
+    return sorted(moves, reverse=src == "A")  # Seems to take the most efficient path?
 
 
 #     +---+---+
@@ -57,7 +57,7 @@ def build_directional_keypad_graph() -> nx.DiGraph:
         "<": [("v", ">")],
         ">": [("v", "<"), ("A", "^")],
         "^": [("A", ">"), ("v", "v")],
-        "v": [("<", "v"), (">", ">"), ("^", "^")],
+        "v": [("<", "<"), (">", ">"), ("^", "^")],
     }
     for src, dst in movements.items():
         for d in dst:
@@ -72,70 +72,35 @@ def dir_movements(g: nx.DiGraph, src: str, dst: str) -> list[str]:
     return moves
 
 
-# def dir_movements(key: str) -> list[str]:
-#     match key:
-#         case "A":
-#             return ["A"]
-#         case "<":
-#             return ["v", "<", "<", "A", ">", ">", "^"]
-#         case ">":
-#             return ["v", "A", "^"]
-#         case "^":
-#             return ["<", "A", ">"]
-#         case "v":
-#             return ["v", "<", "A", ">", "^"]
-#     raise ValueError(f"Invalid key: {key}")
-
-
-# <vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A
-# v<<A>>^A<A>AvA<^AA>A<vAAA>^A
-# <A^A>^^AvvvA
-# 029A
+#
 
 
 def part1(codes: list[str]) -> int:
     num_move_graph = build_numeric_keypad_graph()
     dir_move_graph = build_directional_keypad_graph()
 
-    # print(movements(g, "A", "7"))
-
-    test_codes = [
-        "029A",
-        "980A",
-        "179A",
-        "456A",
-        "379A",
-    ]
-
     t = 0
 
-    for code in test_codes:
-        #
-        # First directional keypad
-        #
-
+    for code in codes:
         moves1 = []
         for a, b in pairwise("A" + code):
             moves1 += num_movements(num_move_graph, a, b)
             moves1.append("A")
-        # print("".join(moves1))
+        # print("".join(moves1) + f" {len(moves1)}")
 
         moves2 = []
         for a, b in pairwise(["A"] + moves1):
             moves2 += dir_movements(dir_move_graph, a, b)
-            # moves2 += dir_movements(dir_move_graph, b, "A")
             moves2.append("A")
-        # print("".join(moves2))
+        # print("".join(moves2) + f" {len(moves2)}")
 
         moves3 = []
         for a, b in pairwise(["A"] + moves2):
             moves3 += dir_movements(dir_move_graph, a, b)
-            # moves2 += dir_movements(dir_move_graph, b, "A")
             moves3.append("A")
+        # print("".join(moves3) + f" {len(moves3)}")
 
         print(code + ": " + "".join(moves3) + f" ({len(moves3)})")
-
-        # print("LEN", len(moves3))
 
         t += len(moves3) * int(code[:-1])
 
@@ -143,4 +108,5 @@ def part1(codes: list[str]) -> int:
 
 
 if __name__ == "__main__":
-    print("Part1", part1(["029A"]))
+    print("Test1", part1(["029A", "980A", "179A", "456A", "379A"]), "Should be 126384")
+    print("Part1", part1(["879A", "508A", "463A", "593A", "189A"]), "Should not be 198336")
