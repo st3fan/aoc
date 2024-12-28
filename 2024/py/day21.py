@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from functools import cache
 from itertools import pairwise
 
 import networkx as nx
@@ -65,10 +66,15 @@ def build_directional_keypad_graph() -> nx.DiGraph:
     return g
 
 
-def dir_movements(g: nx.DiGraph, src: str, dst: str) -> list[str]:
+NUM_GRAPH = build_numeric_keypad_graph()
+DIR_GRAPH = build_directional_keypad_graph()
+
+
+@cache
+def dir_movements(src: str, dst: str) -> list[str]:
     moves = []
-    for a, b in pairwise(nx.shortest_path(g, source=src, target=dst)):
-        moves.append(g.get_edge_data(a, b)["move"])
+    for a, b in pairwise(nx.shortest_path(DIR_GRAPH, source=src, target=dst)):
+        moves.append(DIR_GRAPH.get_edge_data(a, b)["move"])
     return moves
 
 
@@ -83,9 +89,6 @@ def all_moves(g: nx.DiGraph, src: str, dst: str) -> list[list[str]]:
 
 
 #
-
-NUM_GRAPH = build_numeric_keypad_graph()
-DIR_GRAPH = build_directional_keypad_graph()
 
 
 def old_part1(codes: list[str]) -> int:
@@ -103,13 +106,13 @@ def old_part1(codes: list[str]) -> int:
 
         moves2 = []
         for a, b in pairwise(["A"] + moves1):
-            moves2 += dir_movements(dir_move_graph, a, b)
+            moves2 += dir_movements(a, b)
             moves2.append("A")
         # print("".join(moves2) + f" {len(moves2)}")
 
         moves3 = []
         for a, b in pairwise(["A"] + moves2):
-            moves3 += dir_movements(dir_move_graph, a, b)
+            moves3 += dir_movements(a, b)
             moves3.append("A")
         # print("".join(moves3) + f" {len(moves3)}")
 
@@ -133,24 +136,35 @@ def min_button_presses(code: str) -> int:
                     path = num_path_1 + ["A"] + num_path_2 + ["A"] + num_path_3 + ["A"] + num_path_4 + ["A"]
                     # print(code, path)
 
-                    moves2 = []
-                    for a, b in pairwise(["A"] + path):
-                        moves2 += dir_movements(DIR_GRAPH, a, b)
-                        moves2.append("A")
-                    # print("".join(moves2) + f" {len(moves2)}")
+                    def _foo(path):
+                        new_path = []
+                        for a, b in pairwise(["A"] + path):
+                            new_path += dir_movements(a, b)
+                            new_path.append("A")
+                        return new_path
 
-                    moves3 = []
-                    for a, b in pairwise(["A"] + moves2):
-                        moves3 += dir_movements(DIR_GRAPH, a, b)
-                        moves3.append("A")
+                    for _ in range(25):
+                        path = _foo(path)
+                        print(code, len(path))
+
+                    # moves2 = []
+                    # for a, b in pairwise(["A"] + path):
+                    #     moves2 += dir_movements(a, b)
+                    #     moves2.append("A")
+                    # # print("".join(moves2) + f" {len(moves2)}")
+
+                    # moves3 = []
+                    # for a, b in pairwise(["A"] + moves2):
+                    #     moves3 += dir_movements(a, b)
+                    #     moves3.append("A")
                     # print("".join(moves3) + f" {len(moves3)}")
 
                     # print(code + ": " + "".join(moves3) + f" ({len(moves3)})")
 
-                    t = len(moves3)
+                    t = len(path)
                     if t < min_presses:
                         min_presses = t
-                        min_moves = moves3
+                        min_moves = path.copy()
 
     print(code + ": " + "".join(min_moves) + f" ({len(min_moves)}) !!!")
     return min_presses
@@ -193,4 +207,4 @@ def _part1(codes: list[str]) -> int:
 
 if __name__ == "__main__":
     print("Test1", part1(["029A", "980A", "179A", "456A", "379A"]), "Should be 126384")
-    print("Part1", part1(["879A", "508A", "463A", "593A", "189A"]), "Should not be 198336")
+    print("Part1", part1(["879A", "508A", "463A", "593A", "189A"]), "Should be 188384")
