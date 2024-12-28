@@ -37,13 +37,6 @@ def build_numeric_keypad_graph() -> nx.DiGraph:
     return g
 
 
-def num_movements(g: nx.DiGraph, src: str, dst: str) -> list[str]:
-    moves = []
-    for a, b in pairwise(nx.shortest_path(g, source=src, target=dst)):
-        moves.append(g.get_edge_data(a, b)["move"])
-    return sorted(moves, reverse=src == "A")  # Seems to take the most efficient path?
-
-
 #     +---+---+
 #     | ^ | A |
 # +---+---+---+
@@ -91,43 +84,10 @@ def all_moves(g: nx.DiGraph, src: str, dst: str) -> list[list[str]]:
 #
 
 
-def old_part1(codes: list[str]) -> int:
-    num_move_graph = build_numeric_keypad_graph()
-    dir_move_graph = build_directional_keypad_graph()
-
-    t = 0
-
-    for code in codes:
-        moves1 = []
-        for a, b in pairwise("A" + code):
-            moves1 += num_movements(num_move_graph, a, b)
-            moves1.append("A")
-        # print("".join(moves1) + f" {len(moves1)}")
-
-        moves2 = []
-        for a, b in pairwise(["A"] + moves1):
-            moves2 += dir_movements(a, b)
-            moves2.append("A")
-        # print("".join(moves2) + f" {len(moves2)}")
-
-        moves3 = []
-        for a, b in pairwise(["A"] + moves2):
-            moves3 += dir_movements(a, b)
-            moves3.append("A")
-        # print("".join(moves3) + f" {len(moves3)}")
-
-        print(code + ": " + "".join(moves3) + f" ({len(moves3)})")
-
-        t += len(moves3) * int(code[:-1])
-
-    return t
-
-
-def min_button_presses(code: str) -> int:
+def min_button_presses1(code: str, n: int) -> int:
     min_presses = 9999999999
-    min_moves = []
 
-    # For all the combination possible to do the code. Can probably do this nicer but these do not generate that much combinations.
+    # LOL At least there are not so much for the numeric
     for num_path_1 in all_moves(NUM_GRAPH, "A", code[0]):
         for num_path_2 in all_moves(NUM_GRAPH, code[0], code[1]):
             for num_path_3 in all_moves(NUM_GRAPH, code[1], code[2]):
@@ -142,53 +102,32 @@ def min_button_presses(code: str) -> int:
                             new_path.append("A")
                         return new_path
 
-                    for _ in range(2):
+                    for _ in range(n):
                         path = _foo(path)
 
                     t = len(path)
                     if t < min_presses:
                         min_presses = t
-                        min_moves = path.copy()
 
-    # print(code + ": " + "".join(min_moves) + f" ({len(min_moves)}) !!!")
     return min_presses
 
 
+def min_button_presses2(code: str, n: int) -> int:
+    return 0  # TODO TODO TODO TODO
+
+
 def part1(codes: list[str]) -> int:
-    return sum(min_button_presses(code) * int(code[:-1]) for code in codes)
+    return sum(min_button_presses1(code, 2) * int(code[:-1]) for code in codes)
 
 
-def _part1(codes: list[str]) -> int:
-    for code in codes:
-        min_moves = 0xFFFFFFFF
-        min_t = 293892389238
-        for a, b in pairwise("A" + code):
-            t = 0
-            for moves1 in all_moves(NUM_GRAPH, a, b):
-                moves1.append("A")
-                print(code, "MOVES1", moves1)
-                for a, b in pairwise(["A"] + moves1):
-                    for moves2 in all_moves(DIR_GRAPH, a, b):
-                        moves2.append("A")
-                        print(code, "MOVES2", moves2)
-                        for a, b in pairwise(["A"] + moves2):
-                            for moves3 in all_moves(DIR_GRAPH, a, b):
-                                moves3.append("A")
-                                t += len(moves3)
-                                print(code, "MOVES3", moves3)
-                                # print(len(moves3))
-                                if len(moves3) < min_moves:
-                                    min_moves = len(moves3)
-            # print("TTT", t)
-            if t < min_t:
-                min_t = t
-
-        # print("MIN_T", min_t)
-        print(code, "=>", min_moves)
-
-    return 0
+def part2(codes: list[str]) -> int:
+    return sum(min_button_presses2(code, 4) * int(code[:-1]) for code in codes)
 
 
 if __name__ == "__main__":
     print("Test1", part1(["029A", "980A", "179A", "456A", "379A"]), "Should be 126384")
     print("Part1", part1(["879A", "508A", "463A", "593A", "189A"]), "Should be 188384")
+
+    codes = ["879A", "508A", "463A", "593A", "189A"]
+    print("Part2 Method1", sum(min_button_presses1(code, 8) * int(code[:-1]) for code in codes))
+    print("Part2 Method2", sum(min_button_presses2(code, 8) * int(code[:-1]) for code in codes))
