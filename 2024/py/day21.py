@@ -70,7 +70,7 @@ NUM_GRAPH = build_numeric_keypad_graph()
 DIR_GRAPH = build_directional_keypad_graph()
 
 
-@cache
+@cache  # Barely helps. But maybe more effective for part two.
 def dir_movements(src: str, dst: str) -> list[str]:
     moves = []
     for a, b in pairwise(nx.shortest_path(DIR_GRAPH, source=src, target=dst)):
@@ -127,14 +127,13 @@ def min_button_presses(code: str) -> int:
     min_presses = 9999999999
     min_moves = []
 
-    # For all the combination possible to do the code
+    # For all the combination possible to do the code. Can probably do this nicer but these do not generate that much combinations.
     for num_path_1 in all_moves(NUM_GRAPH, "A", code[0]):
         for num_path_2 in all_moves(NUM_GRAPH, code[0], code[1]):
             for num_path_3 in all_moves(NUM_GRAPH, code[1], code[2]):
                 for num_path_4 in all_moves(NUM_GRAPH, code[2], code[3]):
                     # We generate unique paths - this is what you would type in
                     path = num_path_1 + ["A"] + num_path_2 + ["A"] + num_path_3 + ["A"] + num_path_4 + ["A"]
-                    # print(code, path)
 
                     def _foo(path):
                         new_path = []
@@ -143,30 +142,15 @@ def min_button_presses(code: str) -> int:
                             new_path.append("A")
                         return new_path
 
-                    for _ in range(25):
+                    for _ in range(2):
                         path = _foo(path)
-                        print(code, len(path))
-
-                    # moves2 = []
-                    # for a, b in pairwise(["A"] + path):
-                    #     moves2 += dir_movements(a, b)
-                    #     moves2.append("A")
-                    # # print("".join(moves2) + f" {len(moves2)}")
-
-                    # moves3 = []
-                    # for a, b in pairwise(["A"] + moves2):
-                    #     moves3 += dir_movements(a, b)
-                    #     moves3.append("A")
-                    # print("".join(moves3) + f" {len(moves3)}")
-
-                    # print(code + ": " + "".join(moves3) + f" ({len(moves3)})")
 
                     t = len(path)
                     if t < min_presses:
                         min_presses = t
                         min_moves = path.copy()
 
-    print(code + ": " + "".join(min_moves) + f" ({len(min_moves)}) !!!")
+    # print(code + ": " + "".join(min_moves) + f" ({len(min_moves)}) !!!")
     return min_presses
 
 
