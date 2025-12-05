@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from pathlib import Path
-from typing import Callable, TypeAlias
+from typing import Callable
 
 
 def read_input(path: Path) -> list[tuple[int, int]]:
@@ -13,7 +13,7 @@ def read_input(path: Path) -> list[tuple[int, int]]:
     return [_parse_range(range) for range in contents.strip().split(",")]
 
 
-ProductIdValidator: TypeAlias = Callable[[int], bool]
+type ProductIdValidator = Callable[[int], bool]
 
 
 def valid_id1(id: int) -> bool:
