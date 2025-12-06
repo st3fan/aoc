@@ -32,6 +32,7 @@ def read_input1(path: Path) -> list[Problem]:
 def read_input2(path: Path) -> list[Problem]:
     lines = path.read_text().rstrip().split("\n")
 
+    # From here on it is all stupid
     max_len = max(len(line) for line in lines)
     hlines = [line.ljust(max_len) for line in lines[:-1]]
 
@@ -47,18 +48,10 @@ def read_input2(path: Path) -> list[Problem]:
     return problems
 
 
-def part1(problems: list[Problem]) -> int:
+def solve(problems: list[Problem]) -> int:
     return sum(p.total() for p in problems)
-
-
-def part2(problems: list[Problem]) -> int:
-    return sum(p.total() for p in problems)
-
-
-def transform(text: str) -> str:
-    return text
 
 
 if __name__ == "__main__":
-    print("Part 1: ", part1(read_input1(Path("day06_input.txt"))))
-    print("Part 2: ", part2(read_input2(Path("day06_input.txt"))))
+    print("Part 1: ", solve(read_input1(Path("day06_input.txt"))))
+    print("Part 2: ", solve(read_input2(Path("day06_input.txt"))))
